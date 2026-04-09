@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{# ===================================================
+   HERO SECTION — Chamada para ação principal
+   =================================================== #}
+<section class="hero">
+  <div class="container">
+    <h1 class="hero__title">
+      Ajude a reunir famílias<br>com seus <span>pets</span> 🐾
+    </h1>
+    <p class="hero__subtitle">
+      Encontrou um pet perdido? Perdeu seu animal de estimação?
+      Publique um anúncio e alcance pessoas da sua região.
+    </p>
+    <div class="hero__actions">
+      <a href="{{ url_for('posts.create') }}?status=found" class="btn btn--primary btn--lg">
+        🐶 Encontrei um Pet
+      </a>
+      <a href="{{ url_for('posts.create') }}?status=lost" class="btn btn--outline btn--lg">
+        🔍 Meu Pet Está Perdido
+      </a>
+    </div>
+  </div>
+</section>
+
+{# ===================================================
+   FEED DE POSTS RECENTES
+   =================================================== #}
+<div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+
+  {# Título e filtros #}
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <h2 class="section-title" style="margin-bottom: 0;">
+      Posts recentes
+    </h2>
+    <a href="{{ url_for('posts.list_posts') }}" class="btn btn--ghost btn--sm">
+      Ver todos →
+    </a>
+  </div>
+
+  {# Filtros rápidos #}
+  <div class="filters">
+    <a href="{{ url_for('main.index') }}" class="filter-btn active">
+      Todos
+    </a>
+    <a href="{{ url_for('posts.list_posts', status='lost') }}" class="filter-btn">
+      🔴 Perdidos
+    </a>
+    <a href="{{ url_for('posts.list_posts', status='found') }}" class="filter-btn">
+      🟢 Encontrados
+    </a>
+    <a href="{{ url_for('posts.list_posts', pet_type='dog') }}" class="filter-btn">
+      🐶 Cachorros
+    </a>
+    <a href="{{ url_for('posts.list_posts', pet_type='cat') }}" class="filter-btn">
+      🐱 Gatos
+    </a>
+  </div>
+
+  {# Grid de cards ou estado vazio #}
+  {% if posts %}
+    <div class="grid grid--3">
+      {% for post in posts %}
+        {% include 'posts/_card.html' %}
+      {% endfor %}
+    </div>
+
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href="{{ url_for('posts.list_posts') }}" class="btn btn--outline">
+        Ver todos os anúncios
+      </a>
+    </div>
+
+  {% else %}
+    {# Nenhum post ainda #}
+    <div class="empty-state">
+      <div class="empty-state__icon">🐾</div>
+      <h3 class="empty-state__title">Nenhum anúncio ainda</h3>
+      <p>Seja o primeiro a publicar um anúncio e ajudar um pet a voltar para casa!</p>
+      <div style="margin-top: 1.5rem;">
+        <a href="{{ url_for('posts.create') }}" class="btn btn--primary">
+          Criar primeiro anúncio
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

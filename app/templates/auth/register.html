@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="container--narrow" style="margin: 0 auto; padding: 2rem 1rem;">
+
+    <div class="form-card">
+
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span style="font-size: 3rem;">🐾</span>
+        <h1 style="font-size: 1.75rem; margin-top: 0.5rem;">Criar conta</h1>
+        <p class="text-muted">Cadastre-se para publicar anúncios e ajudar pets perdidos.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+          {{ form.name.label }}
+          {{ form.name(class="error" if form.name.errors else "") }}
+          {% for error in form.name.errors %}
+            <span class="field-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          {{ form.email.label }}
+          {{ form.email(class="error" if form.email.errors else "") }}
+          {% for error in form.email.errors %}
+            <span class="field-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          {{ form.phone.label }}
+          {{ form.phone(class="error" if form.phone.errors else "") }}
+          {% for error in form.phone.errors %}
+            <span class="field-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password(class="error" if form.password.errors else "") }}
+            {% for error in form.password.errors %}
+              <span class="field-error">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-group">
+            {{ form.confirm_password.label }}
+            {{ form.confirm_password(class="error" if form.confirm_password.errors else "") }}
+            {% for error in form.confirm_password.errors %}
+              <span class="field-error">{{ error }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          {{ form.submit(class="btn btn--primary btn--full") }}
+        </div>
+
+      </form>
+
+      <div style="text-align: center; padding-top: 1rem; border-top: 1px solid var(--color-border);">
+        <p class="text-muted">
+          Já tem uma conta?
+          <a href="{{ url_for('auth.login') }}" style="font-weight: 600;">Entrar</a>
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

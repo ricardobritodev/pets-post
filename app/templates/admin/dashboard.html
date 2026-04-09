@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 1rem;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1>⚙️ Painel Administrativo</h1>
+      <p class="text-muted">Gerencie usuários e posts da plataforma.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn--outline btn--sm">Dashboard</a>
+      <a href="{{ url_for('admin.users') }}" class="btn btn--outline btn--sm">Usuários</a>
+      <a href="{{ url_for('admin.posts') }}" class="btn btn--outline btn--sm">Posts</a>
+    </div>
+  </div>
+
+  {# ===================================================
+     VIEW: Dashboard principal
+     =================================================== #}
+  {% if not view %}
+
+    {# Cards de estatísticas #}
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-card__number">{{ total_users }}</div>
+        <div class="stat-card__label">Usuários cadastrados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__number">{{ active_posts }}</div>
+        <div class="stat-card__label">Posts ativos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__number" style="color: var(--color-danger);">{{ lost_posts }}</div>
+        <div class="stat-card__label">Pets perdidos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__number" style="color: var(--color-success);">{{ found_posts }}</div>
+        <div class="stat-card__label">Pets encontrados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__number" style="color: var(--color-secondary);">{{ resolved_posts }}</div>
+        <div class="stat-card__label">Casos resolvidos 🎉</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__number">{{ total_posts }}</div>
+        <div class="stat-card__label">Total de posts</div>
+      </div>
+    </div>
+
+    {# Posts recentes #}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+
+      <div>
+        <h2 style="font-size: 1.125rem; margin-bottom: 1rem;">📋 Posts recentes</h2>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Status</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for post in recent_posts %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('posts.detail', post_id=post.id) }}" style="font-weight: 600;">
+                    {{ post.title | truncate(30) }}
+                  </a>
+                </td>
+                <td>
+                  {% if post.status == 'lost' %}
+                    <span class="badge badge--lost">Perdido</span>
+                  {% else %}
+                    <span class="badge badge--found">Encontrado</span>
+                  {% endif %}
+                </td>
+                <td style="font-size: 0.875rem; color: var(--color-text-muted);">
+                  {{ post.created_at.strftime('%d/%m/%Y') }}
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3" class="text-muted" style="text-align: center;">Nenhum post ainda</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2 style="font-size: 1.125rem; margin-bottom: 1rem;">👤 Últimos cadastros</h2>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Perfil</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in recent_users %}
+              <tr>
+                <td>
+                  <div>
+                    <strong>{{ user.name }}</strong>
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">{{ user.email }}</div>
+                  </div>
+                </td>
+                <td>
+                  {% if user.is_admin() %}
+                    <span class="badge badge--admin">Admin</span>
+                  {% else %}
+                    <span class="badge" style="background: #f0f0f0; color: #555;">Usuário</span>
+                  {% endif %}
+                </td>
+                <td style="font-size: 0.875rem; color: var(--color-text-muted);">
+                  {{ user.created_at.strftime('%d/%m/%Y') }}
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3" class="text-muted" style="text-align: center;">Nenhum usuário ainda</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  {# ===================================================
+     VIEW: Gerenciar usuários
+     =================================================== #}
+  {% elif view == 'users' %}
+
+    <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">👤 Todos os usuários</h2>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Nome / Email</th>
+          <th>Perfil</th>
+          <th>Status</th>
+          <th>Cadastro</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>
+              <strong>{{ user.name }}</strong>
+              <div style="font-size: 0.8rem; color: var(--color-text-muted);">{{ user.email }}</div>
+            </td>
+            <td>
+              {% if user.is_admin() %}
+                <span class="badge badge--admin">Admin</span>
+              {% else %}
+                <span class="badge" style="background: #f0f0f0; color: #555;">Usuário</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if user.is_active %}
+                <span class="badge badge--found">Ativo</span>
+              {% else %}
+                <span class="badge badge--lost">Inativo</span>
+              {% endif %}
+            </td>
+            <td style="font-size: 0.875rem; color: var(--color-text-muted);">
+              {{ user.created_at.strftime('%d/%m/%Y') }}
+            </td>
+            <td>
+              {% if user.id != current_user.id %}
+                <form method="POST" action="{{ url_for('admin.toggle_user', user_id=user.id) }}" style="display: inline;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn--ghost btn--sm"
+                          onclick="return confirm('{{ 'Desativar' if user.is_active else 'Ativar' }} o usuário {{ user.name }}?')"
+                          style="font-size: 0.8rem;">
+                    {{ '🔴 Desativar' if user.is_active else '🟢 Ativar' }}
+                  </button>
+                </form>
+              {% else %}
+                <span class="text-muted" style="font-size: 0.8rem;">Você</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="text-muted" style="text-align: center;">Nenhum usuário cadastrado</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {# ===================================================
+     VIEW: Gerenciar posts
+     =================================================== #}
+  {% elif view == 'posts' %}
+
+    <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">📋 Todos os posts</h2>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Autor</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+          <tr>
+            <td>
+              <a href="{{ url_for('posts.detail', post_id=post.id) }}" style="font-weight: 600;">
+                {{ post.title | truncate(40) }}
+              </a>
+            </td>
+            <td style="font-size: 0.875rem;">{{ post.user.name }}</td>
+            <td>
+              {% if post.is_resolved %}
+                <span class="badge badge--resolved">Resolvido</span>
+              {% elif post.status == 'lost' %}
+                <span class="badge badge--lost">Perdido</span>
+              {% else %}
+                <span class="badge badge--found">Encontrado</span>
+              {% endif %}
+              {% if not post.is_active %}
+                <span class="badge" style="background: #fde8e8; color: #c0392b;">Inativo</span>
+              {% endif %}
+            </td>
+            <td style="font-size: 0.875rem; color: var(--color-text-muted);">
+              {{ post.created_at.strftime('%d/%m/%Y') }}
+            </td>
+            <td>
+              <a href="{{ url_for('posts.edit', post_id=post.id) }}" class="btn btn--ghost btn--sm" style="font-size: 0.8rem;">
+                ✏️ Editar
+              </a>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="text-muted" style="text-align: center;">Nenhum post encontrado</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {% endif %}
+
+</div>
+{% endblock %}

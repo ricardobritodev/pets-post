@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="container--narrow" style="margin: 0 auto; padding: 2rem 1rem;">
+
+    <div class="form-card">
+
+      {# Cabeçalho do formulário #}
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span style="font-size: 3rem;">🐾</span>
+        <h1 style="font-size: 1.75rem; margin-top: 0.5rem;">Bem-vindo de volta!</h1>
+        <p class="text-muted">Entre na sua conta para gerenciar seus anúncios.</p>
+      </div>
+
+      {# Formulário de login #}
+      <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+        {# Token de segurança CSRF — protege contra ataques #}
+        {{ form.hidden_tag() }}
+
+        {# Campo Email #}
+        <div class="form-group">
+          {{ form.email.label }}
+          {{ form.email(class="error" if form.email.errors else "") }}
+          {% for error in form.email.errors %}
+            <span class="field-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        {# Campo Senha #}
+        <div class="form-group">
+          {{ form.password.label }}
+          {{ form.password(class="error" if form.password.errors else "") }}
+          {% for error in form.password.errors %}
+            <span class="field-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        {# Lembrar de mim #}
+        <div class="form-group">
+          <div class="form-check">
+            {{ form.remember() }}
+            {{ form.remember.label }}
+          </div>
+        </div>
+
+        {# Botão de envio #}
+        <div class="form-group">
+          {{ form.submit(class="btn btn--primary btn--full") }}
+        </div>
+
+      </form>
+
+      {# Link para cadastro #}
+      <div style="text-align: center; padding-top: 1rem; border-top: 1px solid var(--color-border);">
+        <p class="text-muted">
+          Não tem uma conta?
+          <a href="{{ url_for('auth.register') }}" style="font-weight: 600;">Cadastre-se grátis</a>
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}
