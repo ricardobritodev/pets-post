@@ -17,6 +17,7 @@ from app import create_app
 from app.extensions import db
 from app.models.user import User
 from app.models.pet_post import PetPost
+from app.models.partner import Partner
 
 # Cria o app em modo de desenvolvimento
 app = create_app('development')
@@ -179,6 +180,69 @@ def seed_posts(users):
     db.session.commit()
 
 
+def seed_partners():
+    """Cria parceiros de exemplo para o mapa."""
+    print('\n🗺️  Criando parceiros...')
+
+    parceiros = [
+        {
+            'name': 'Lar Temporário da Ana',
+            'partner_type': 'foster_home',
+            'description': 'Acolhemos cães e gatos de pequeno porte por até 30 dias.',
+            'address': 'Pinheiros, São Paulo, SP',
+            'phone': '(11) 98765-1111',
+            'email': 'ana@exemplo.com',
+        },
+        {
+            'name': 'Casa dos Bichos',
+            'partner_type': 'foster_home',
+            'description': 'Lar temporário para pets resgatados de qualquer porte.',
+            'address': 'Savassi, Belo Horizonte, MG',
+            'phone': '(31) 97654-2222',
+        },
+        {
+            'name': 'Petshop Amigo Fiel',
+            'partner_type': 'petshop',
+            'description': 'Divulgamos pets perdidos e apoiamos a causa animal.',
+            'address': 'Copacabana, Rio de Janeiro, RJ',
+            'phone': '(21) 99111-3333',
+            'website': 'https://exemplo.com',
+        },
+        {
+            'name': 'PetCenter Curitiba',
+            'partner_type': 'petshop',
+            'description': 'Petshop parceiro com espaço para divulgação de adoção.',
+            'address': 'Praça Osório, Curitiba, PR',
+            'phone': '(41) 98888-4444',
+        },
+        {
+            'name': 'Clínica Vet Vida Animal',
+            'partner_type': 'vet_clinic',
+            'description': 'Atendemos pets resgatados com desconto social.',
+            'address': 'Parque Ibirapuera, São Paulo, SP',
+            'phone': '(11) 93333-5555',
+            'email': 'vidaanimal@exemplo.com',
+        },
+        {
+            'name': 'Hospital Veterinário Central',
+            'partner_type': 'vet_clinic',
+            'description': 'Pronto-socorro 24h para animais resgatados.',
+            'address': 'Jardim América, São Paulo, SP',
+            'phone': '(11) 91111-6666',
+        },
+    ]
+
+    for dados in parceiros:
+        if Partner.query.filter_by(name=dados['name']).first():
+            print(f'  ⏭️  Parceiro "{dados["name"]}" já existe, pulando...')
+            continue
+        partner = Partner(**dados)
+        db.session.add(partner)
+        print(f'  ✅ Parceiro "{dados["name"]}" criado')
+
+    db.session.commit()
+
+
 def main():
     """Função principal que executa todos os seeds."""
     print('🌱 Iniciando seeds do PetPost...\n')
@@ -186,6 +250,7 @@ def main():
     with app.app_context():
         users = seed_users()
         seed_posts(users)
+        seed_partners()
 
     print('\n✨ Seeds concluídos com sucesso!')
     print('\n📋 Credenciais do admin:')

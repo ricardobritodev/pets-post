@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+      integrity="sha256-YU3qCpj/P06tdPBJGPax0bm6Q1wltfwjsho5TR4+TYc="
+      crossorigin=""/>
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+      integrity="sha256-YSWCMtmNZNwqex4CEw1nQhvFub2lmU7vcCKP+XVwwXA="
+      crossorigin=""/>
+<style>
+  .map-page { display: flex; flex-direction: column; height: calc(100vh - var(--navbar-height, 64px)); }
+  .map-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+  .map-toolbar__title { font-weight: 600; margin-right: var(--space-sm); white-space: nowrap; }
+  .map-toolbar__filters { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
+  #map { flex: 1; min-height: 400px; }
+  .map-legend-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  /* Ícones personalizados dos marcadores */
+  .marker-pin {
+    width: 28px; height: 28px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid rgba(0,0,0,0.2);
+  }
+  .marker-pin span { transform: rotate(45deg); font-size: 13px; line-height: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="map-page">
+
+  <div class="map-toolbar">
+    <span class="map-toolbar__title">🗺️ Mapa de Parceiros</span>
+
+    <div class="map-toolbar__filters" role="group" aria-label="Filtrar tipos de local">
+      <button class="filter-btn active" data-type="all">Todos</button>
+      <button class="filter-btn" data-type="foster_home">
+        <span class="map-legend-dot" style="background:#16a34a;"></span>🏠 Lares Temporários
+      </button>
+      <button class="filter-btn" data-type="petshop">
+        <span class="map-legend-dot" style="background:#2563eb;"></span>🛒 Petshops
+      </button>
+      <button class="filter-btn" data-type="vet_clinic">
+        <span class="map-legend-dot" style="background:#dc2626;"></span>🏥 Clínicas
+      </button>
+    </div>
+
+    <button id="btn-locate" class="btn btn--outline btn--sm" style="margin-left: auto;">
+      📍 Minha localização
+    </button>
+  </div>
+
+  <div id="map" aria-label="Mapa de lares temporários, petshops e clínicas parceiras"></div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
+        integrity="sha256-Hk4dIpcqOSb0hZjgyvFOP+cEmDXUKKNE/tT542ZbNQg="
+        crossorigin=""></script>
+<script>
+(function () {
+  // ── Configuração dos tipos ──────────────────────────────────────────
+  var TYPES = {
+    foster_home: { color: '#16a34a', emoji: '🏠' },
+    petshop:     { color: '#2563eb', emoji: '🛒' },
+    vet_clinic:  { color: '#dc2626', emoji: '🏥' },
+  };
+
+  // ── Inicializa o mapa centrado no Brasil ───────────────────────────
+  var map = L.map('map').setView([-15.788, -47.879], 5);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(map);
+
+  // ── Cluster group por tipo ─────────────────────────────────────────
+  var clusters = {};
+  Object.keys(TYPES).forEach(function (type) {
+    clusters[type] = L.markerClusterGroup({ showCoverageOnHover: false });
+    map.addLayer(clusters[type]);
+  });
+
+  // ── Cria ícone colorido com emoji ──────────────────────────────────
+  function makeIcon(type) {
+    var cfg = TYPES[type] || { color: '#666', emoji: '📍' };
+    return L.divIcon({
+      className: '',
+      html: '<div class="marker-pin" style="background:' + cfg.color + '"><span>' + cfg.emoji + '</span></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    });
+  }
+
+  // ── Monta HTML do popup ────────────────────────────────────────────
+  function makePopup(p) {
+    var cfg = TYPES[p.type] || { color: '#666' };
+    var html = '<div style="min-width:200px;">';
+    html += '<strong style="font-size:1rem;">' + p.name + '</strong><br>';
+    html += '<span style="font-size:0.8rem;color:' + cfg.color + ';font-weight:600;">' + p.type_label + '</span>';
+    html += '<hr style="margin:6px 0;border:none;border-top:1px solid #eee;">';
+    html += '<div style="font-size:0.875rem;color:#555;">📍 ' + p.address + '</div>';
+    if (p.phone) html += '<div style="font-size:0.875rem;margin-top:4px;">📱 <a href="tel:' + p.phone + '">' + p.phone + '</a></div>';
+    if (p.email) html += '<div style="font-size:0.875rem;margin-top:4px;">✉️ <a href="mailto:' + p.email + '">' + p.email + '</a></div>';
+    if (p.website) html += '<div style="font-size:0.875rem;margin-top:4px;">🌐 <a href="' + p.website + '" target="_blank" rel="noopener">Visitar site</a></div>';
+    html += '<div style="margin-top:8px;">';
+    html += '<a href="https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '" target="_blank" rel="noopener" style="font-size:0.8rem;color:#2563eb;">Como chegar →</a>';
+    html += '</div></div>';
+    return html;
+  }
+
+  // ── Carrega parceiros da API ───────────────────────────────────────
+  var allPartners = [];
+
+  fetch('/api/parceiros', { credentials: 'same-origin' })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      allPartners = data;
+      data.forEach(function (p) {
+        if (!clusters[p.type]) return;
+        L.marker([p.lat, p.lng], { icon: makeIcon(p.type) })
+          .bindPopup(makePopup(p))
+          .addTo(clusters[p.type]);
+      });
+    })
+    .catch(function () {
+      console.warn('Não foi possível carregar os parceiros.');
+    });
+
+  // ── Filtros por tipo ───────────────────────────────────────────────
+  var activeType = 'all';
+
+  document.querySelectorAll('.map-toolbar__filters .filter-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.map-toolbar__filters .filter-btn').forEach(function (b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      activeType = btn.dataset.type;
+
+      Object.keys(clusters).forEach(function (type) {
+        if (activeType === 'all' || activeType === type) {
+          if (!map.hasLayer(clusters[type])) map.addLayer(clusters[type]);
+        } else {
+          if (map.hasLayer(clusters[type])) map.removeLayer(clusters[type]);
+        }
+      });
+    });
+  });
+
+  // ── Geolocalização ─────────────────────────────────────────────────
+  function locateUser() {
+    if (!navigator.geolocation) {
+      alert('Seu browser não suporta geolocalização.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        var latlng = [pos.coords.latitude, pos.coords.longitude];
+        map.setView(latlng, 13);
+
+        L.circleMarker(latlng, {
+          radius: 10,
+          color: '#2563eb',
+          fillColor: '#2563eb',
+          fillOpacity: 0.3,
+          weight: 2,
+        }).addTo(map).bindPopup('Você está aqui').openPopup();
+      },
+      function () {
+        alert('Não foi possível obter sua localização. Verifique as permissões do browser.');
+      },
+      { timeout: 8000 }
+    );
+  }
+
+  document.getElementById('btn-locate').addEventListener('click', locateUser);
+
+  // Pede localização automaticamente na primeira visita
+  locateUser();
+}());
+</script>
+{% endblock %}

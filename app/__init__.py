@@ -52,7 +52,7 @@ def create_app(config_name=None):
     # (necessário para gerar as migrações corretamente)
     # -----------------------------------------------
     with app.app_context():
-        from app.models import user, pet_post, photo, adoption_post, adoption_photo  # noqa: F401
+        from app.models import user, pet_post, photo, adoption_post, adoption_photo, partner  # noqa: F401
 
     # -----------------------------------------------
     # Registra os blueprints (grupos de rotas)
@@ -63,12 +63,14 @@ def create_app(config_name=None):
     from app.routes.posts import posts_bp
     from app.routes.admin import admin_bp
     from app.routes.adoption import adoption_bp
+    from app.routes.map import map_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(posts_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(adoption_bp)
+    app.register_blueprint(map_bp)
 
     # -----------------------------------------------
     # Variáveis globais disponíveis em todos os templates

@@ -102,6 +102,35 @@ def geocode_adoption():
         print('Concluído!')
 
 
+@app.cli.command('geocode-partners')
+def geocode_partners():
+    """Geocodifica parceiros que ainda não têm coordenadas: flask geocode-partners"""
+    import time
+    from app.models.partner import Partner
+    from app.services.geocoding import geocode_address
+
+    with app.app_context():
+        partners = Partner.query.filter(Partner.lat.is_(None)).all()
+
+        if not partners:
+            print('Nenhum parceiro sem coordenadas encontrado.')
+            return
+
+        print(f'Geocodificando {len(partners)} parceiro(s)...')
+        for partner in partners:
+            lat, lng = geocode_address(partner.address)
+            if lat and lng:
+                partner.lat = lat
+                partner.lng = lng
+                db.session.commit()
+                print(f'  ✓ {partner.name}: ({lat:.5f}, {lng:.5f})')
+            else:
+                print(f'  ✗ {partner.name}: endereço não encontrado — {partner.address}')
+            time.sleep(1.1)
+
+        print('Concluído!')
+
+
 if __name__ == '__main__':
     # debug=True recarrega o servidor automaticamente ao salvar arquivos
     # NÃO use debug=True em produção!

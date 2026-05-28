@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 640px; margin: 0 auto; padding: 2rem 1rem;">
+
+  <div style="margin-bottom: var(--space-lg);">
+    <a href="{{ url_for('admin.partners') }}" class="text-muted" style="font-size: 0.875rem;">
+      ← Voltar para parceiros
+    </a>
+    <h1 style="margin-top: var(--space-sm);">{{ title }}</h1>
+  </div>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="form-section">
+      <h3 class="form-section__title">📋 Identificação</h3>
+
+      <div class="form-group">
+        {{ form.name.label(text="Nome " + '<span class="required">*</span>' | safe) }}
+        {{ form.name(class="error" if form.name.errors else "") }}
+        {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.partner_type.label(text="Tipo " + '<span class="required">*</span>' | safe) }}
+          {{ form.partner_type(class="error" if form.partner_type.errors else "") }}
+          {% for e in form.partner_type.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;padding-top:var(--space-lg);">
+          <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-weight:500;">
+            {{ form.is_active() }}
+            Visível no mapa
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        {{ form.description.label }}
+        {{ form.description(rows=3) }}
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="form-section__title">📍 Localização</h3>
+
+      <div class="form-group">
+        {{ form.address.label(text="Endereço " + '<span class="required">*</span>' | safe) }}
+        {{ form.address(class="error" if form.address.errors else "") }}
+        <span class="form-hint">Seja específico para o geocoding funcionar. Ex: Pinheiros, São Paulo, SP</span>
+        {% for e in form.address.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      {% if partner and partner.lat %}
+        <p class="form-hint" style="color: var(--color-success, #16a34a);">
+          ✓ Geocodificado: {{ '%.5f' % partner.lat }}, {{ '%.5f' % partner.lng }}
+        </p>
+      {% elif partner %}
+        <p class="form-hint" style="color: var(--color-danger, #dc2626);">
+          ✗ Sem coordenadas — salve com um endereço válido para aparecer no mapa.
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="form-section">
+      <h3 class="form-section__title">📞 Contato</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.phone.label }}
+          {{ form.phone() }}
+        </div>
+        <div class="form-group">
+          {{ form.email.label }}
+          {{ form.email() }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        {{ form.website.label }}
+        {{ form.website() }}
+      </div>
+    </div>
+
+    <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+      {{ form.submit(class="btn btn--primary") }}
+      <a href="{{ url_for('admin.partners') }}" class="btn btn--ghost">Cancelar</a>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

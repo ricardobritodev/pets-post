@@ -15,6 +15,8 @@
          class="btn btn--outline btn--sm {{ 'btn--nav-active' if view == 'users' }}">Usuários</a>
       <a href="{{ url_for('admin.posts') }}"
          class="btn btn--outline btn--sm {{ 'btn--nav-active' if view == 'posts' }}">Posts</a>
+      <a href="{{ url_for('admin.partners') }}"
+         class="btn btn--outline btn--sm {{ 'btn--nav-active' if view == 'partners' }}">Parceiros</a>
     </div>
   </div>
 
@@ -238,6 +240,63 @@
           </tr>
         {% else %}
           <tr><td colspan="5" class="text-muted" style="text-align: center;">Nenhum post encontrado</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {# ===================================================
+     VIEW: Gerenciar parceiros
+     =================================================== #}
+  {% elif view == 'partners' %}
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <h2 style="font-size:1.25rem;">🗺️ Parceiros do Mapa</h2>
+      <a href="{{ url_for('admin.partner_create') }}" class="btn btn--primary btn--sm">+ Novo Parceiro</a>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Tipo</th>
+          <th>Endereço</th>
+          <th>Mapa</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for partner in partners %}
+          <tr>
+            <td><strong>{{ partner.name }}</strong></td>
+            <td style="font-size:0.875rem;">{{ partner.type_label }}</td>
+            <td style="font-size:0.875rem;color:var(--color-text-muted);">{{ partner.address | truncate(40) }}</td>
+            <td style="font-size:0.875rem;">
+              {% if partner.lat %}
+                <span style="color:var(--color-success,#16a34a);">✓ OK</span>
+              {% else %}
+                <span style="color:var(--color-danger,#dc2626);">✗ Sem coord.</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if partner.is_active %}
+                <span class="badge badge--found">Ativo</span>
+              {% else %}
+                <span class="badge badge--lost">Inativo</span>
+              {% endif %}
+            </td>
+            <td style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <a href="{{ url_for('admin.partner_edit', partner_id=partner.id) }}" class="btn btn--ghost btn--sm">✏️ Editar</a>
+              <form method="POST" action="{{ url_for('admin.partner_delete', partner_id=partner.id) }}" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn--ghost btn--sm"
+                        onclick="return confirm('Remover {{ partner.name }}?')"
+                        style="color:var(--color-danger,#dc2626);">🗑️</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-muted" style="text-align:center;">Nenhum parceiro cadastrado ainda.</td></tr>
         {% endfor %}
       </tbody>
     </table>
