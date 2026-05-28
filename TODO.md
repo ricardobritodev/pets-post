@@ -76,12 +76,12 @@
   - **Arquivo:** `app/static/js/main.js` e `app/static/css/main.css`
   - **Dica:** `CSS hamburger menu`, `JavaScript toggle class`
 
-- [x] **F-12 · Integração com Google Maps (Mapa de Localização)**
+- [x] **F-12 · Integração com Leaflet.js + OpenStreetMap (Mapa de Localização)**
   - Mapa interativo na página de detalhe com marcador onde o pet foi visto
   - **Arquivo:** `app/templates/posts/detail.html`
   - **Dica:** `Google Maps JavaScript API`, `Leaflet.js (gratuito)`, `lat/lng no template`
 
-- [ ] **F-13 · Templates do Módulo de Adoção**
+- [x] **F-13 · Templates do Módulo de Adoção**
   - Lista de pets para adoção, formulário de cadastro e página de detalhe
   - **Arquivos:** `app/templates/adoption/list.html`, `detail.html`, `create.html`
   - **Dica:** Reutilizar estrutura dos templates de `posts/`
