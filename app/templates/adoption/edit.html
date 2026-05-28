@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<style>
+  .cep-status { display: block; font-size: 0.8rem; margin-top: 0.25rem; min-height: 1.1rem; }
+  .cep-status--loading { color: var(--color-muted, #6b7280); }
+  .cep-status--ok      { color: var(--color-success, #16a34a); }
+  .cep-status--error   { color: var(--color-danger,  #dc2626); }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container" style="max-width: 760px; margin: 0 auto;">
 
@@ -95,8 +104,15 @@
       <h3 class="form-section__title">📍 Localização</h3>
 
       <div class="form-group">
+        {{ form.cep.label }}
+        {{ form.cep(id="cep-input") }}
+        <span class="cep-status"></span>
+        <span class="form-hint">Preencha o CEP para sugerir o endereço automaticamente.</span>
+      </div>
+
+      <div class="form-group">
         {{ form.location.label }}
-        {{ form.location(class="error" if form.location.errors else "") }}
+        {{ form.location(id="location-field", class="error" if form.location.errors else "") }}
         <span class="form-hint">Alterar o endereço atualiza o mapa automaticamente.</span>
         {% for error in form.location.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
@@ -166,4 +182,9 @@
   </form>
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/cep.js') }}"></script>
+<script>initCepLookup('#cep-input', '#location-field');</script>
 {% endblock %}

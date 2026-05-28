@@ -26,6 +26,16 @@ class PartnerForm(FlaskForm):
         render_kw={'placeholder': 'Informações sobre o local, serviços, horários...', 'rows': 3}
     )
 
+    cep = StringField(
+        'CEP (opcional)',
+        validators=[Optional(), Length(max=9)],
+        render_kw={
+            'placeholder': '00000-000',
+            'autocomplete': 'postal-code',
+            'inputmode': 'numeric',
+        }
+    )
+
     address = StringField(
         'Endereço',
         validators=[DataRequired(message='O endereço é obrigatório.'), Length(max=255)],

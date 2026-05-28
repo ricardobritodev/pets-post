@@ -86,7 +86,7 @@
   - **Arquivos:** `app/templates/adoption/list.html`, `detail.html`, `create.html`
   - **Dica:** Reutilizar estrutura dos templates de `posts/`
 
-- [ ] **F-14 · Mapa de Lares Temporários e Petshops**
+- [x] **F-14 · Mapa de Lares Temporários e Petshops**
   - Mapa com lares temporários e petshops parceiros próximos ao usuário
   - **Arquivo:** `app/templates/map/index.html`
   - **Dica:** `Geolocation API browser`, `Leaflet.js marker clusters`

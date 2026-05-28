@@ -84,6 +84,16 @@ class PetPostForm(FlaskForm):
         validators=[Optional()]
     )
 
+    cep = StringField(
+        'CEP (opcional)',
+        validators=[Optional(), Length(max=9)],
+        render_kw={
+            'placeholder': '00000-000',
+            'autocomplete': 'postal-code',
+            'inputmode': 'numeric',
+        }
+    )
+
     last_seen_location = StringField(
         'Localização (onde foi visto)',
         validators=[

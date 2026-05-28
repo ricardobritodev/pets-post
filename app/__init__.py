@@ -64,6 +64,7 @@ def create_app(config_name=None):
     from app.routes.admin import admin_bp
     from app.routes.adoption import adoption_bp
     from app.routes.map import map_bp
+    from app.routes.api import api_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
@@ -71,6 +72,7 @@ def create_app(config_name=None):
     app.register_blueprint(admin_bp)
     app.register_blueprint(adoption_bp)
     app.register_blueprint(map_bp)
+    app.register_blueprint(api_bp)
 
     # -----------------------------------------------
     # Variáveis globais disponíveis em todos os templates

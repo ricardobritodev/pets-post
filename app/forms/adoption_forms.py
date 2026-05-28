@@ -75,6 +75,16 @@ class AdoptionForm(FlaskForm):
         }
     )
 
+    cep = StringField(
+        'CEP (opcional)',
+        validators=[Optional(), Length(max=9)],
+        render_kw={
+            'placeholder': '00000-000',
+            'autocomplete': 'postal-code',
+            'inputmode': 'numeric',
+        }
+    )
+
     location = StringField(
         'Localização do pet',
         validators=[
