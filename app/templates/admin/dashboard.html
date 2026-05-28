@@ -8,10 +8,13 @@
       <h1>⚙️ Painel Administrativo</h1>
       <p class="text-muted">Gerencie usuários e posts da plataforma.</p>
     </div>
-    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-      <a href="{{ url_for('admin.dashboard') }}" class="btn btn--outline btn--sm">Dashboard</a>
-      <a href="{{ url_for('admin.users') }}" class="btn btn--outline btn--sm">Usuários</a>
-      <a href="{{ url_for('admin.posts') }}" class="btn btn--outline btn--sm">Posts</a>
+    <div class="admin-nav">
+      <a href="{{ url_for('admin.dashboard') }}"
+         class="btn btn--outline btn--sm {{ 'btn--nav-active' if not view }}">Dashboard</a>
+      <a href="{{ url_for('admin.users') }}"
+         class="btn btn--outline btn--sm {{ 'btn--nav-active' if view == 'users' }}">Usuários</a>
+      <a href="{{ url_for('admin.posts') }}"
+         class="btn btn--outline btn--sm {{ 'btn--nav-active' if view == 'posts' }}">Posts</a>
     </div>
   </div>
 
@@ -49,7 +52,7 @@
     </div>
 
     {# Posts recentes #}
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+    <div class="admin-two-col">
 
       <div>
         <h2 style="font-size: 1.125rem; margin-bottom: 1rem;">📋 Posts recentes</h2>

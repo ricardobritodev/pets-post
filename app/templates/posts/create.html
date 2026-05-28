@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" style="padding: 2rem 1rem; max-width: 760px; margin: 0 auto;">
+<div class="container" style="max-width: 760px; margin: 0 auto;">
 
-  <div style="margin-bottom: 1.5rem;">
-    <a href="{{ url_for('posts.list_posts') }}" style="color: var(--color-text-muted); font-size: 0.875rem;">
+  <div style="margin-bottom: var(--space-lg);">
+    <a href="{{ url_for('posts.list_posts') }}" class="text-muted" style="font-size: 0.875rem;">
       ← Voltar para os posts
     </a>
-    <h1 style="margin-top: 0.5rem;">Criar anúncio</h1>
+    <h1 style="margin-top: var(--space-sm);">Criar anúncio</h1>
     <p class="text-muted">Preencha as informações do pet para aumentar as chances de reencontro.</p>
   </div>
 
@@ -16,7 +16,7 @@
 
     {# SEÇÃO 1: Informações do anúncio #}
     <div class="form-section">
-      <p class="form-section__title">📋 Informações do anúncio</p>
+      <h3 class="form-section__title">📋 Informações do anúncio</h3>
 
       <div class="form-group">
         {{ form.title.label(text="Título " + '<span class="required">*</span>' | safe) }}
@@ -39,14 +39,14 @@
 
       <div class="form-group">
         {{ form.description.label(text="Descrição " + '<span class="required">*</span>' | safe) }}
-        {{ form.description(class="error" if form.description.errors else "") }}
+        {{ form.description(class="error" if form.description.errors else "", rows=5) }}
         {% for error in form.description.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
     </div>
 
-    {# SEÇÃO 2: Informações do pet #}
+    {# SEÇÃO 2: Características do pet #}
     <div class="form-section">
-      <p class="form-section__title">🐾 Características do pet</p>
+      <h3 class="form-section__title">🐾 Características do pet</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -74,19 +74,19 @@
 
     {# SEÇÃO 3: Localização #}
     <div class="form-section">
-      <p class="form-section__title">📍 Localização</p>
+      <h3 class="form-section__title">📍 Localização</h3>
 
       <div class="form-group">
         {{ form.last_seen_location.label(text="Onde foi visto? " + '<span class="required">*</span>' | safe) }}
         {{ form.last_seen_location(class="error" if form.last_seen_location.errors else "") }}
-        <small class="text-muted">Seja específico: rua, bairro, cidade, estado.</small>
+        <span class="form-hint">Seja específico: rua, bairro, cidade, estado.</span>
         {% for error in form.last_seen_location.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
     </div>
 
     {# SEÇÃO 4: Contato #}
     <div class="form-section">
-      <p class="form-section__title">📞 Contato</p>
+      <h3 class="form-section__title">📞 Contato</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -103,29 +103,29 @@
       <div class="form-group">
         {{ form.reward.label }}
         {{ form.reward() }}
+        <span class="form-hint">Ex: R$ 200. Deixe em branco se não houver recompensa.</span>
       </div>
     </div>
 
     {# SEÇÃO 5: Fotos #}
     <div class="form-section">
-      <p class="form-section__title">📷 Fotos do pet</p>
+      <h3 class="form-section__title">📷 Fotos do pet</h3>
 
       <div class="form-group">
         <div class="file-upload">
+          <span style="font-size: 2rem; display: block; margin-bottom: var(--space-sm);">📸</span>
           {{ form.photos(id="photos", accept="image/*", multiple=True) }}
-          <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.875rem;">
-            Até 5 fotos. Formatos aceitos: JPG, PNG, GIF, WEBP. Máximo 16MB.
-          </p>
+          <span class="form-hint" style="margin-top: var(--space-sm);">
+            Até 5 fotos · JPG, PNG, GIF, WEBP · Máximo 16 MB por arquivo
+          </span>
         </div>
         {% for error in form.photos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        <div id="photo-preview" style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: var(--space-sm);"></div>
       </div>
-
-      {# Área de preview das fotos selecionadas #}
-      <div id="photo-preview" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;"></div>
     </div>
 
     {# Botões #}
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
       {{ form.submit(class="btn btn--primary btn--lg") }}
       <a href="{{ url_for('posts.list_posts') }}" class="btn btn--ghost btn--lg">Cancelar</a>
     </div>

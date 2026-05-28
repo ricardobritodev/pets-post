@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="PetPost — Plataforma para localização de pets perdidos. Ajude pets a voltarem para casa.">
 
-  <title>{% block title %}{{ title or 'PetPost' }}{% endblock %}</title>
+  <title>{% block title %}{% if title %}{{ title }} | PetPost{% else %}PetPost{% endif %}{% endblock %}</title>
 
   {# Google Fonts — Inter para tipografia moderna e legível #}
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -170,7 +170,7 @@
 
       {# Linha final com copyright #}
       <div class="footer__bottom">
-        <p>&copy; {{ 2024 }} PetPost — Projeto acadêmico. Desenvolvido com 🧡 pela equipe.</p>
+        <p>&copy; {{ current_year }} PetPost — Projeto acadêmico. Desenvolvido com 🧡 pela equipe.</p>
       </div>
     </div>
   </footer>

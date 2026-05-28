@@ -100,6 +100,7 @@ h3 { font-size: 1.375rem; } /* 22px */
 h4 { font-size: 1.125rem; } /* 18px */
 
 p { margin-bottom: var(--space-md); }
+p:last-child { margin-bottom: 0; }
 
 a {
   color: var(--color-primary);
@@ -368,11 +369,18 @@ main {
 
 .pet-card__footer {
   margin-top: auto;
-  padding-top: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.pet-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
 .pet-card__date {
@@ -512,12 +520,19 @@ textarea { resize: vertical; }
 }
 
 .form-section__title {
-  font-size: 1rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   margin-bottom: var(--space-lg);
+}
+
+.form-hint {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
 }
 
 .form-row {
@@ -872,6 +887,157 @@ textarea { resize: vertical; }
 }
 
 /* ============================================================
+   LAYOUT DE DETALHE DO POST
+   ============================================================ */
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+/* Galeria de miniaturas */
+.gallery-main {
+  width: 100%;
+  max-height: 450px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  display: block;
+}
+
+.gallery-placeholder {
+  width: 100%;
+  height: 250px;
+  background: #f5f5f5;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  border: 1px solid var(--color-border);
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.gallery-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: var(--transition);
+  display: block;
+}
+
+.gallery-thumb:hover { border-color: var(--color-text-muted); }
+.gallery-thumb.active { border-color: var(--color-primary); }
+
+/* Info list no detalhe */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.info-list dt {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.125rem;
+}
+
+.info-list dd {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Recompensa */
+.reward-banner {
+  background: #fff8e1;
+  border: 1px solid #ffc107;
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.reward-banner__icon { font-size: 1.5rem; display: block; }
+.reward-banner__value { font-weight: 700; color: #856404; margin: var(--space-xs) 0 0; }
+.reward-banner__label { font-size: 0.8125rem; color: #856404; }
+
+/* Ações do dono */
+.post-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ============================================================
+   ADMIN
+   ============================================================ */
+
+.admin-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  margin-top: var(--space-xl);
+}
+
+.admin-nav {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.btn--nav-active {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+/* ============================================================
+   FILTROS DINÂMICOS — LOADING STATE
+   ============================================================ */
+
+#posts-grid {
+  transition: opacity 0.15s ease;
+}
+
+#posts-grid.is-loading {
+  opacity: 0.45;
+  pointer-events: none;
+  /* Indica ao usuário que o conteúdo está sendo carregado */
+  cursor: wait;
+}
+
+/* ============================================================
+   ACESSIBILIDADE — FOCO VISÍVEL
+   ============================================================ */
+
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
    13. MEDIA QUERIES — RESPONSIVO
    ============================================================ */
 
@@ -881,6 +1047,7 @@ textarea { resize: vertical; }
   .grid--3 { grid-template-columns: repeat(2, 1fr); }
   .footer__grid { grid-template-columns: 1fr 1fr; }
   .admin-stats { grid-template-columns: repeat(2, 1fr); }
+  .detail-layout { grid-template-columns: 1fr 300px; }
 }
 
 /* Mobile — até 768px */
@@ -899,6 +1066,9 @@ textarea { resize: vertical; }
   .footer__grid { grid-template-columns: 1fr; }
 
   .admin-stats { grid-template-columns: 1fr; }
+
+  .detail-layout { grid-template-columns: 1fr; }
+  .admin-two-col { grid-template-columns: 1fr; }
 
   /* Esconde o menu desktop e mostra versão simplificada */
   .navbar__nav {

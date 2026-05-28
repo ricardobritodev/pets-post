@@ -1,0 +1,63 @@
+{#
+  _grid.html — Partial: contagem + grid de cards + paginação
+  Renderizado diretamente em requisições AJAX (sem page wrapper).
+  Incluído pelo list.html em requisições normais.
+#}
+
+{# Contagem de resultados #}
+{% if posts.total > 0 %}
+  <p class="text-muted mb-lg">
+    {{ posts.total }} anúncio{{ 's' if posts.total != 1 }} encontrado{{ 's' if posts.total != 1 }}
+  </p>
+{% endif %}
+
+{# Grid de cards ou estado vazio #}
+{% if posts.items %}
+  <div class="grid grid--3">
+    {% for post in posts.items %}
+      {% include 'posts/_card.html' %}
+    {% endfor %}
+  </div>
+
+  {# Paginação #}
+  {% if posts.pages > 1 %}
+    <div class="pagination">
+      {% if posts.has_prev %}
+        <a href="{{ url_for('posts.list_posts', page=posts.prev_num, status=status_filter, pet_type=type_filter) }}">
+          ←
+        </a>
+      {% endif %}
+
+      {% for page_num in posts.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+        {% if page_num %}
+          {% if page_num == posts.page %}
+            <span class="active">{{ page_num }}</span>
+          {% else %}
+            <a href="{{ url_for('posts.list_posts', page=page_num, status=status_filter, pet_type=type_filter) }}">
+              {{ page_num }}
+            </a>
+          {% endif %}
+        {% else %}
+          <span>…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if posts.has_next %}
+        <a href="{{ url_for('posts.list_posts', page=posts.next_num, status=status_filter, pet_type=type_filter) }}">
+          →
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-state__icon">🔍</div>
+    <h3 class="empty-state__title">Nenhum anúncio encontrado</h3>
+    <p>Tente remover os filtros ou seja o primeiro a publicar!</p>
+    <div style="margin-top: var(--space-lg); display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+      <a href="{{ url_for('posts.list_posts') }}" class="btn btn--outline">Limpar filtros</a>
+      <a href="{{ url_for('posts.create') }}" class="btn btn--primary">Criar anúncio</a>
+    </div>
+  </div>
+{% endif %}

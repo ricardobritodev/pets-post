@@ -28,8 +28,8 @@
 
   <div class="pet-card__body">
 
-    {# Badge de status #}
-    <div style="margin-bottom: 0.5rem;">
+    {# Badges de status e tipo #}
+    <div class="pet-card__badges">
       {% if post.is_resolved %}
         <span class="badge badge--resolved">✅ Resolvido</span>
       {% elif post.status == 'lost' %}
@@ -61,7 +61,7 @@
   </div>
 
   {# Rodapé do card #}
-  <div class="pet-card__footer" style="padding: 0.75rem 1rem;">
+  <div class="pet-card__footer">
     <span class="pet-card__date">
       {{ post.created_at.strftime('%d/%m/%Y') }}
     </span>

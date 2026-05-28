@@ -23,13 +23,13 @@ def index():
         .all()
     )
 
-    return render_template('main/index.html', posts=posts, title='PetPost — Ajude pets a voltarem para casa')
+    return render_template('main/index.html', posts=posts)
 
 
 @main_bp.route('/sobre')
 def about():
     """GET /sobre — Página sobre o projeto."""
-    return render_template('main/about.html', title='Sobre o PetPost')
+    return render_template('main/about.html', title='Sobre')
 
 # TODO: Implementar busca por CEP com ViaCEP API para filtrar posts por região
 # TODO: Adicionar página de estatísticas (pets reencontrados, posts ativos)

@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" style="padding: 2rem 1rem; max-width: 760px; margin: 0 auto;">
+<div class="container" style="max-width: 760px; margin: 0 auto;">
 
-  <div style="margin-bottom: 1.5rem;">
-    <a href="{{ url_for('posts.detail', post_id=post.id) }}" style="color: var(--color-text-muted); font-size: 0.875rem;">
+  <div style="margin-bottom: var(--space-lg);">
+    <a href="{{ url_for('posts.detail', post_id=post.id) }}" class="text-muted" style="font-size: 0.875rem;">
       ← Voltar para o anúncio
     </a>
-    <h1 style="margin-top: 0.5rem;">Editar anúncio</h1>
+    <h1 style="margin-top: var(--space-sm);">Editar anúncio</h1>
     <p class="text-muted">Atualize as informações do pet.</p>
   </div>
 
@@ -15,7 +15,7 @@
     {{ form.hidden_tag() }}
 
     <div class="form-section">
-      <p class="form-section__title">📋 Informações do anúncio</p>
+      <h3 class="form-section__title">📋 Informações do anúncio</h3>
 
       <div class="form-group">
         {{ form.title.label }}
@@ -27,21 +27,24 @@
         <div class="form-group">
           {{ form.status.label }}
           {{ form.status(class="error" if form.status.errors else "") }}
+          {% for error in form.status.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
         </div>
         <div class="form-group">
           {{ form.pet_type.label }}
           {{ form.pet_type(class="error" if form.pet_type.errors else "") }}
+          {% for error in form.pet_type.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
         </div>
       </div>
 
       <div class="form-group">
         {{ form.description.label }}
-        {{ form.description(class="error" if form.description.errors else "") }}
+        {{ form.description(class="error" if form.description.errors else "", rows=5) }}
+        {% for error in form.description.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
     </div>
 
     <div class="form-section">
-      <p class="form-section__title">🐾 Características do pet</p>
+      <h3 class="form-section__title">🐾 Características do pet</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -67,17 +70,18 @@
     </div>
 
     <div class="form-section">
-      <p class="form-section__title">📍 Localização</p>
+      <h3 class="form-section__title">📍 Localização</h3>
 
       <div class="form-group">
         {{ form.last_seen_location.label }}
         {{ form.last_seen_location(class="error" if form.last_seen_location.errors else "") }}
+        <span class="form-hint">Seja específico: rua, bairro, cidade, estado.</span>
         {% for error in form.last_seen_location.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
     </div>
 
     <div class="form-section">
-      <p class="form-section__title">📞 Contato</p>
+      <h3 class="form-section__title">📞 Contato</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -94,23 +98,24 @@
       <div class="form-group">
         {{ form.reward.label }}
         {{ form.reward() }}
+        <span class="form-hint">Ex: R$ 200. Deixe em branco se não houver recompensa.</span>
       </div>
     </div>
 
     {# Fotos existentes #}
     {% if post.photos %}
       <div class="form-section">
-        <p class="form-section__title">📷 Fotos atuais</p>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <h3 class="form-section__title">📷 Fotos atuais</h3>
+        <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
           {% for photo in post.photos %}
             <div style="position: relative;">
               <img
                 src="{{ photo.url }}"
                 alt="Foto {{ loop.index }}"
-                style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid {% if photo.is_primary %}var(--color-primary){% else %}var(--color-border){% endif %};"
+                style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid {{ 'var(--color-primary)' if photo.is_primary else 'var(--color-border)' }};"
               >
               {% if photo.is_primary %}
-                <span style="position: absolute; bottom: 4px; left: 4px; background: var(--color-primary); color: white; font-size: 0.6rem; padding: 2px 4px; border-radius: 3px; font-weight: 700;">CAPA</span>
+                <span style="position: absolute; bottom: 4px; left: 4px; background: var(--color-primary); color: white; font-size: 0.625rem; padding: 2px 5px; border-radius: 3px; font-weight: 700;">CAPA</span>
               {% endif %}
             </div>
           {% endfor %}
@@ -119,22 +124,22 @@
     {% endif %}
 
     <div class="form-section">
-      <p class="form-section__title">📷 Adicionar novas fotos</p>
+      <h3 class="form-section__title">📷 Adicionar novas fotos</h3>
 
       <div class="form-group">
         <div class="file-upload">
+          <span style="font-size: 2rem; display: block; margin-bottom: var(--space-sm);">📸</span>
           {{ form.photos(id="photos", accept="image/*", multiple=True) }}
-          <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.875rem;">
-            Você pode adicionar mais fotos. Limite total: 5 fotos por post.
-          </p>
+          <span class="form-hint" style="margin-top: var(--space-sm);">
+            Limite total: 5 fotos por anúncio · JPG, PNG, GIF, WEBP
+          </span>
         </div>
         {% for error in form.photos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        <div id="photo-preview" style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: var(--space-sm);"></div>
       </div>
-
-      <div id="photo-preview" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
     </div>
 
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
       {{ form.submit(class="btn btn--primary btn--lg") }}
       <a href="{{ url_for('posts.detail', post_id=post.id) }}" class="btn btn--ghost btn--lg">Cancelar</a>
     </div>

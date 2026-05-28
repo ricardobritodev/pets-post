@@ -12,6 +12,7 @@ Como funciona:
 """
 
 import os
+from datetime import datetime
 from flask import Flask
 
 from app.config import config
@@ -66,6 +67,13 @@ def create_app(config_name=None):
     app.register_blueprint(main_bp)
     app.register_blueprint(posts_bp)
     app.register_blueprint(admin_bp)
+
+    # -----------------------------------------------
+    # Variáveis globais disponíveis em todos os templates
+    # -----------------------------------------------
+    @app.context_processor
+    def inject_globals():
+        return {'current_year': datetime.utcnow().year}
 
     # -----------------------------------------------
     # Garante que a pasta de uploads existe

@@ -104,13 +104,18 @@ def list_posts():
         .paginate(page=page, per_page=12, error_out=False)
     )
 
-    return render_template(
-        'posts/list.html',
+    template_vars = dict(
         posts=posts,
         status_filter=status_filter,
         type_filter=type_filter,
         title='Todos os posts'
     )
+
+    # Requisições AJAX recebem apenas o partial do grid (sem page wrapper)
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render_template('posts/_grid.html', **template_vars)
+
+    return render_template('posts/list.html', **template_vars)
 
 
 @posts_bp.route('/<int:post_id>')
@@ -138,6 +143,11 @@ def create():
     POST /posts/criar — Processa e cria o post
     """
     form = PetPostForm()
+
+    if request.method == 'GET':
+        status_param = request.args.get('status')
+        if status_param in ('lost', 'found'):
+            form.status.data = status_param
 
     if form.validate_on_submit():
         # Cria o post com os dados do formulário
