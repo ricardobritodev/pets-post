@@ -108,6 +108,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // -----------------------------------------------
   initDynamicFilters();
 
+  // -----------------------------------------------
+  // 7. Menu hambúrguer para mobile (F-11)
+  // -----------------------------------------------
+  initHamburgerMenu();
+
 });
 
 // ================================================================
@@ -194,6 +199,70 @@ function fetchGrid(url, pushState) {
     .finally(function () {
       grid.classList.remove('is-loading');
     });
+}
+
+// ================================================================
+// MENU HAMBÚRGUER (F-11)
+// Toggle da classe is-open na navbar, com atualização de
+// aria-expanded e fechamento em 4 situações:
+//   1. Clique no botão toggle
+//   2. Clique em qualquer link do menu
+//   3. Clique fora da navbar
+//   4. Tecla Escape
+//   5. Redimensionamento para desktop (≥ 769px)
+// ================================================================
+
+function initHamburgerMenu() {
+  var navbar  = document.querySelector('.navbar');
+  var toggle  = document.querySelector('.navbar__toggle');
+  var nav     = document.getElementById('navbar-nav');
+
+  if (!toggle || !nav) return;
+
+  // 1. Abre/fecha ao clicar no botão
+  toggle.addEventListener('click', function (e) {
+    e.stopPropagation(); // impede que o click chegue ao document listener
+    var willOpen = !navbar.classList.contains('is-open');
+    setMenuState(willOpen);
+  });
+
+  // 2. Fecha ao clicar em qualquer link do menu
+  nav.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      setMenuState(false);
+    }
+  });
+
+  // 3. Fecha ao clicar fora da navbar
+  document.addEventListener('click', function (e) {
+    if (!navbar.contains(e.target)) {
+      setMenuState(false);
+    }
+  });
+
+  // 4. Fecha com a tecla Escape
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && navbar.classList.contains('is-open')) {
+      setMenuState(false);
+      toggle.focus(); // devolve foco ao botão para não perder contexto
+    }
+  });
+
+  // 5. Fecha ao redimensionar para desktop
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 768) {
+      setMenuState(false);
+    }
+  });
+
+  function setMenuState(open) {
+    navbar.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.setAttribute(
+      'aria-label',
+      open ? 'Fechar menu de navegação' : 'Abrir menu de navegação'
+    );
+  }
 }
 
 // Marca como ativo o botão cujos query params coincidem com a URL atual
