@@ -66,17 +66,17 @@
   - **Arquivo:** `app/templates/admin/dashboard.html`
   - **Dica:** `CSS data tables`, `Flask admin pattern`
 
-- [ ] **F-10 · Filtros Dinâmicos sem Recarregar Página**
-  - Filtros de busca usando Fetch API (sem recarregar a página)
+- [x] **F-10 · Filtros Dinâmicos sem Recarregar Página**
+  - Filtros de busca usando Fetch API (sem recarregar a página) 
   - **Arquivo:** `app/static/js/main.js`
   - **Dica:** `JavaScript Fetch API`, `Flask JSON response`, `DOM manipulation`
 
-- [ ] **F-11 · Menu Hambúrguer para Mobile**
+- [x] **F-11 · Menu Hambúrguer para Mobile**
   - Implementar menu responsivo para telas pequenas (atualmente escondido)
   - **Arquivo:** `app/static/js/main.js` e `app/static/css/main.css`
   - **Dica:** `CSS hamburger menu`, `JavaScript toggle class`
 
-- [ ] **F-12 · Integração com Google Maps (Mapa de Localização)**
+- [x] **F-12 · Integração com Google Maps (Mapa de Localização)**
   - Mapa interativo na página de detalhe com marcador onde o pet foi visto
   - **Arquivo:** `app/templates/posts/detail.html`
   - **Dica:** `Google Maps JavaScript API`, `Leaflet.js (gratuito)`, `lat/lng no template`

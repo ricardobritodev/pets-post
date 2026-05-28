@@ -66,6 +66,7 @@ class User(UserMixin, db.Model):
     # Um usuário pode ter vários posts de pets (one-to-many)
     # 'back_populates' cria o acesso reverso: post.user retorna o User
     posts = db.relationship('PetPost', back_populates='user', lazy='dynamic')
+    adoption_posts = db.relationship('AdoptionPost', back_populates='user', lazy='dynamic')
 
     # -----------------------------------------------
     # Métodos

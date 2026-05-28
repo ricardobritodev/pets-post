@@ -60,6 +60,12 @@
             </a>
           </li>
           <li>
+            <a href="{{ url_for('adoption.list_posts') }}"
+               class="{{ 'active' if request.blueprint == 'adoption' }}">
+              Adoção
+            </a>
+          </li>
+          <li>
             <a href="{{ url_for('main.about') }}"
                class="{{ 'active' if request.endpoint == 'main.about' }}">
               Sobre

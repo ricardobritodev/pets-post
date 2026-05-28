@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 760px; margin: 0 auto;">
+
+  <div style="margin-bottom: var(--space-lg);">
+    <a href="{{ url_for('adoption.detail', post_id=post.id) }}" class="text-muted" style="font-size: 0.875rem;">
+      ← Voltar para o anúncio
+    </a>
+    <h1 style="margin-top: var(--space-sm);">Editar anúncio de adoção</h1>
+    <p class="text-muted">Atualize as informações do pet.</p>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+
+    {# SEÇÃO 1: Informações do anúncio #}
+    <div class="form-section">
+      <h3 class="form-section__title">📋 Informações do anúncio</h3>
+
+      <div class="form-group">
+        {{ form.title.label }}
+        {{ form.title(class="error" if form.title.errors else "") }}
+        {% for error in form.title.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.pet_type.label }}
+          {{ form.pet_type(class="error" if form.pet_type.errors else "") }}
+          {% for error in form.pet_type.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+          {{ form.pet_size.label }}
+          {{ form.pet_size() }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        {{ form.description.label }}
+        {{ form.description(class="error" if form.description.errors else "", rows=5) }}
+        {% for error in form.description.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+    </div>
+
+    {# SEÇÃO 2: Características do pet #}
+    <div class="form-section">
+      <h3 class="form-section__title">🐾 Características do pet</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.pet_name.label }}
+          {{ form.pet_name() }}
+        </div>
+        <div class="form-group">
+          {{ form.pet_breed.label }}
+          {{ form.pet_breed() }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        {{ form.pet_color.label }}
+        {{ form.pet_color() }}
+      </div>
+
+      <div class="form-row" style="align-items: center;">
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; font-weight: 500;">
+            {{ form.is_neutered() }}
+            ✂️ Castrado
+          </label>
+        </div>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; font-weight: 500;">
+            {{ form.is_vaccinated() }}
+            💉 Vacinado
+          </label>
+        </div>
+      </div>
+    </div>
+
+    {# SEÇÃO 3: Requisitos para o adotante #}
+    <div class="form-section">
+      <h3 class="form-section__title">⚠️ Requisitos para o adotante</h3>
+
+      <div class="form-group">
+        {{ form.adopter_requirements.label }}
+        {{ form.adopter_requirements(rows=3) }}
+        <span class="form-hint">Descreva o perfil ideal do adotante.</span>
+      </div>
+    </div>
+
+    {# SEÇÃO 4: Localização #}
+    <div class="form-section">
+      <h3 class="form-section__title">📍 Localização</h3>
+
+      <div class="form-group">
+        {{ form.location.label }}
+        {{ form.location(class="error" if form.location.errors else "") }}
+        <span class="form-hint">Alterar o endereço atualiza o mapa automaticamente.</span>
+        {% for error in form.location.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+    </div>
+
+    {# SEÇÃO 5: Contato #}
+    <div class="form-section">
+      <h3 class="form-section__title">📞 Contato</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.contact_phone.label }}
+          {{ form.contact_phone(class="error" if form.contact_phone.errors else "") }}
+          {% for error in form.contact_phone.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+          {{ form.contact_email.label }}
+          {{ form.contact_email() }}
+        </div>
+      </div>
+    </div>
+
+    {# SEÇÃO 6: Fotos existentes #}
+    {% if post.photos %}
+      <div class="form-section">
+        <h3 class="form-section__title">🖼️ Fotos atuais</h3>
+        <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+          {% for photo in post.photos %}
+            <div style="position: relative;">
+              <img
+                src="{{ photo.url }}"
+                alt="Foto {{ loop.index }}"
+                style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-sm); border: 2px solid {{ 'var(--color-primary)' if photo.is_primary else 'var(--color-border)' }};"
+              >
+              {% if photo.is_primary %}
+                <span class="badge" style="position: absolute; top: 4px; left: 4px; font-size: 0.625rem; background: var(--color-primary); color: white;">CAPA</span>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <p class="form-hint" style="margin-top: var(--space-sm);">{{ post.photos | length }} de 5 fotos usadas. Novas fotos são adicionadas às existentes.</p>
+      </div>
+    {% endif %}
+
+    {# SEÇÃO 7: Adicionar fotos #}
+    <div class="form-section">
+      <h3 class="form-section__title">📷 Adicionar fotos</h3>
+
+      <div class="form-group">
+        <div class="file-upload">
+          <span style="font-size: 2rem; display: block; margin-bottom: var(--space-sm);">📸</span>
+          {{ form.photos(id="photos", accept="image/*", multiple=True) }}
+          <span class="form-hint" style="margin-top: var(--space-sm);">
+            Até 5 fotos no total · JPG, PNG, GIF, WEBP
+          </span>
+        </div>
+        {% for error in form.photos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        <div id="photo-preview" style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: var(--space-sm);"></div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+      {{ form.submit(class="btn btn--primary btn--lg") }}
+      <a href="{{ url_for('adoption.detail', post_id=post.id) }}" class="btn btn--ghost btn--lg">Cancelar</a>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

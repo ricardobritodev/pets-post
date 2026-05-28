@@ -67,6 +67,41 @@ def geocode_posts():
         print('Concluído!')
 
 
+@app.cli.command('geocode-adoption')
+def geocode_adoption():
+    """
+    Geocodifica posts de adoção que ainda não têm lat/lng armazenados.
+
+        flask geocode-adoption
+    """
+    import time
+    from app.models.adoption_post import AdoptionPost
+    from app.services.geocoding import geocode_address
+
+    with app.app_context():
+        posts = AdoptionPost.query.filter(AdoptionPost.location_lat.is_(None)).all()
+
+        if not posts:
+            print('Nenhum post de adoção sem coordenadas encontrado.')
+            return
+
+        print(f'Geocodificando {len(posts)} post(s) de adoção...')
+
+        for post in posts:
+            lat, lng = geocode_address(post.location)
+            if lat and lng:
+                post.location_lat = lat
+                post.location_lng = lng
+                db.session.commit()
+                print(f'  ✓ Post {post.id}: ({lat:.5f}, {lng:.5f}) — {post.location[:50]}')
+            else:
+                print(f'  ✗ Post {post.id}: endereço não encontrado — {post.location[:50]}')
+
+            time.sleep(1.1)
+
+        print('Concluído!')
+
+
 if __name__ == '__main__':
     # debug=True recarrega o servidor automaticamente ao salvar arquivos
     # NÃO use debug=True em produção!

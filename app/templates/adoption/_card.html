@@ -1,0 +1,71 @@
+{#
+  adoption/_card.html — Card de pet para adoção
+  Variável esperada: post (objeto AdoptionPost)
+#}
+
+<article class="pet-card">
+
+  <a href="{{ url_for('adoption.detail', post_id=post.id) }}">
+    {% if post.primary_photo %}
+      <img
+        src="{{ post.primary_photo.url }}"
+        alt="Foto de {{ post.pet_name or post.pet_type_label }}"
+        class="pet-card__image"
+        loading="lazy"
+      >
+    {% else %}
+      <div class="pet-card__image--placeholder">
+        {% if post.pet_type == 'dog' %}🐶
+        {% elif post.pet_type == 'cat' %}🐱
+        {% elif post.pet_type == 'bird' %}🐦
+        {% else %}🐾{% endif %}
+      </div>
+    {% endif %}
+  </a>
+
+  <div class="pet-card__body">
+
+    <div class="pet-card__badges">
+      {% if post.is_adopted %}
+        <span class="badge badge--resolved">✅ Adotado</span>
+      {% else %}
+        <span class="badge badge--found">💚 Para adoção</span>
+      {% endif %}
+
+      <span class="badge" style="background: #f0f0f0; color: #555;">
+        {% if post.pet_type == 'dog' %}🐶 Cachorro
+        {% elif post.pet_type == 'cat' %}🐱 Gato
+        {% elif post.pet_type == 'bird' %}🐦 Pássaro
+        {% else %}🐾 Outro{% endif %}
+      </span>
+
+      {% if post.is_neutered %}
+        <span class="badge" style="background: #e8f5e9; color: #2e7d32;">✂️ Castrado</span>
+      {% endif %}
+      {% if post.is_vaccinated %}
+        <span class="badge" style="background: #e3f2fd; color: #1565c0;">💉 Vacinado</span>
+      {% endif %}
+    </div>
+
+    <h3 class="pet-card__title">
+      <a href="{{ url_for('adoption.detail', post_id=post.id) }}" style="color: inherit;">
+        {{ post.title }}
+      </a>
+    </h3>
+
+    <p class="pet-card__location">
+      📍 {{ post.location | truncate(50) }}
+    </p>
+
+  </div>
+
+  <div class="pet-card__footer">
+    <span class="pet-card__date">
+      {{ post.created_at.strftime('%d/%m/%Y') }}
+    </span>
+    <a href="{{ url_for('adoption.detail', post_id=post.id) }}" class="btn btn--outline btn--sm">
+      Ver detalhes
+    </a>
+  </div>
+
+</article>
