@@ -29,6 +29,44 @@ def create_db():
         print('   Agora rode: python seeds.py')
 
 
+@app.cli.command('geocode-posts')
+def geocode_posts():
+    """
+    Geocodifica posts que ainda não têm lat/lng armazenados.
+
+    Use após habilitar a feature de mapa para cobrir posts já existentes:
+        flask geocode-posts
+
+    Respeita o rate limit de 1 req/s do Nominatim.
+    """
+    import time
+    from app.models.pet_post import PetPost
+    from app.services.geocoding import geocode_address
+
+    with app.app_context():
+        posts = PetPost.query.filter(PetPost.last_seen_lat.is_(None)).all()
+
+        if not posts:
+            print('Nenhum post sem coordenadas encontrado.')
+            return
+
+        print(f'Geocodificando {len(posts)} post(s)...')
+
+        for post in posts:
+            lat, lng = geocode_address(post.last_seen_location)
+            if lat and lng:
+                post.last_seen_lat = lat
+                post.last_seen_lng = lng
+                db.session.commit()
+                print(f'  ✓ Post {post.id}: ({lat:.5f}, {lng:.5f}) — {post.last_seen_location[:50]}')
+            else:
+                print(f'  ✗ Post {post.id}: endereço não encontrado — {post.last_seen_location[:50]}')
+
+            time.sleep(1.1)  # Respeita o limite de 1 req/s do Nominatim
+
+        print('Concluído!')
+
+
 if __name__ == '__main__':
     # debug=True recarrega o servidor automaticamente ao salvar arquivos
     # NÃO use debug=True em produção!

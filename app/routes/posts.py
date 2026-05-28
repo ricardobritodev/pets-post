@@ -17,6 +17,7 @@ from app.extensions import db
 from app.models.pet_post import PetPost
 from app.models.photo import Photo
 from app.forms.post_forms import PetPostForm
+from app.services.geocoding import geocode_address
 
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
@@ -190,6 +191,13 @@ def create():
 
         db.session.commit()
 
+        # Geocodifica o endereço em background — falha silenciosa se a API estiver fora
+        lat, lng = geocode_address(post.last_seen_location)
+        if lat and lng:
+            post.last_seen_lat = lat
+            post.last_seen_lng = lng
+            db.session.commit()
+
         flash('Seu anúncio foi publicado com sucesso!', 'success')
         return redirect(url_for('posts.detail', post_id=post.id))
 
@@ -250,6 +258,14 @@ def edit(post_id):
                         flash(f'Erro ao salvar foto: {str(e)}', 'warning')
 
         db.session.commit()
+
+        # Re-geocodifica se o endereço foi alterado
+        lat, lng = geocode_address(post.last_seen_location)
+        if lat and lng:
+            post.last_seen_lat = lat
+            post.last_seen_lng = lng
+            db.session.commit()
+
         flash('Anúncio atualizado com sucesso!', 'success')
         return redirect(url_for('posts.detail', post_id=post.id))
 
