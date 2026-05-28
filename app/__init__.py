@@ -14,9 +14,23 @@ Como funciona:
 import os
 from datetime import datetime
 from flask import Flask
+from flask_talisman import Talisman
 
 from app.config import config
-from app.extensions import db, login_manager, migrate, csrf
+from app.extensions import db, login_manager, migrate, csrf, limiter
+
+# CSP compatível com os recursos usados pela app:
+#   - Leaflet (unpkg.com), Google Fonts, OpenStreetMap tiles
+#   - unsafe-inline necessário para os poucos estilos inline nos templates
+_PRODUCTION_CSP = {
+    'default-src': "'self'",
+    'script-src': ["'self'", 'unpkg.com'],
+    'style-src': ["'self'", "'unsafe-inline'", 'fonts.googleapis.com', 'unpkg.com'],
+    'font-src': ["'self'", 'fonts.gstatic.com'],
+    'img-src': ["'self'", 'data:', '*.tile.openstreetmap.org'],
+    'connect-src': ["'self'"],
+    'frame-ancestors': "'none'",
+}
 
 
 def create_app(config_name=None):
@@ -28,16 +42,21 @@ def create_app(config_name=None):
                      Se não informado, usa a variável FLASK_ENV do .env
     """
 
-    # Determina qual configuração usar
+    # Determina qual configuração usar.
+    # FLASK_ENV foi removido no Flask 2.3 — usamos FLASK_CONFIG.
     if config_name is None:
-        config_name = os.environ.get('FLASK_ENV', 'development')
+        config_name = os.environ.get('FLASK_CONFIG', 'development')
 
     # Cria a instância do Flask
     # __name__ diz ao Flask onde procurar templates e arquivos estáticos
     app = Flask(__name__)
 
-    # Carrega as configurações (do arquivo config.py)
-    app.config.from_object(config.get(config_name, config['default']))
+    cfg = config.get(config_name, config['default'])
+    app.config.from_object(cfg)
+
+    # Valida variáveis obrigatórias em produção (SECRET_KEY, DATABASE_URL)
+    if hasattr(cfg, 'init_app'):
+        cfg.init_app(app)
 
     # -----------------------------------------------
     # Registra as extensões no app
@@ -46,6 +65,23 @@ def create_app(config_name=None):
     login_manager.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)
+    limiter.init_app(app)
+
+    # Security headers — apenas em produção para não quebrar dev/testes
+    if config_name == 'production':
+        Talisman(
+            app,
+            force_https=True,
+            strict_transport_security=True,
+            strict_transport_security_max_age=31536000,
+            content_security_policy=_PRODUCTION_CSP,
+            referrer_policy='strict-origin-when-cross-origin',
+            feature_policy={
+                'geolocation': "'none'",
+                'camera': "'none'",
+                'microphone': "'none'",
+            },
+        )
 
     # -----------------------------------------------
     # Importa os models para que o Flask-Migrate os encontre

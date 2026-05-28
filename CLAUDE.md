@@ -40,6 +40,7 @@ Flask app using the **Application Factory** pattern. `create_app(config_name)` i
 - `admin_bp` (`/admin`) — admin dashboard, user and post management
 - `adoption_bp` (`/adocao`) — full CRUD for adoption listings; marks pets as adopted via POST `/adocao/<id>/adotado`
 - `map_bp` (`/mapa`) — partner map page + `/api/parceiros` JSON endpoint (returns active partners with coordinates)
+- `api_bp` (`/api`) — thin REST helpers; currently only `/api/cep/<cep>` which proxies ViaCEP and returns a whitelisted subset (`logradouro`, `bairro`, `localidade`, `uf`)
 
 **Models:**
 - `User`, `PetPost`, `Photo` — core models; relationships: User → PetPost (one-to-many), PetPost → Photo (one-to-many, cascade delete)
@@ -52,7 +53,23 @@ Admin access is checked via `current_user.is_admin()` (`role == 'admin'`); admin
 
 **Geocoding:** `app/services/geocoding.py` calls Nominatim (OpenStreetMap) server-side to convert a free-text address into `(lat, lng)`. Returns `(None, None)` on any failure — posts save normally without coordinates. Restricted to Brazil (`countrycodes=br`), 5 s timeout, 1 req/s limit per Nominatim ToS.
 
-**Testing config** (`TestingConfig`): uses SQLite in-memory (`sqlite:///:memory:`), sets `WTF_CSRF_ENABLED=False`. Each test file sets up fixtures that call `db.create_all()` / `db.drop_all()` — no migration runner needed for tests.
+**Testing config** (`TestingConfig`): uses SQLite in-memory (`sqlite:///:memory:`), sets `WTF_CSRF_ENABLED=False`. Each test file sets up fixtures that call `db.create_all()` / `db.drop_all()` — no migration runner needed for tests. Tests that hit external services (e.g. ViaCEP in `test_api.py`) mock `urllib.request.urlopen` directly.
+
+**Seeds default credentials** (after running `python seeds.py`): `admin@petpost.com` / `Admin@123`.
+
+**Photo upload utility:** `app/utils/upload.py` — single source of truth for `save_photo()` and `allowed_file()`. Both `posts.py` and `adoption.py` import from there. The function runs `Image.verify()` before processing (detects non-images), enforces a 20 MP pixel limit (decompression bomb guard), and always saves a Pillow-regenerated file — the original bytes never touch disk.
+
+**Rate limiting:** Flask-Limiter is initialized in `app/extensions.py` (in-memory storage for dev; swap `storage_uri` to `'redis://...'` in production). Limits: login 10/min · 50/hr, register 5/min · 20/hr, `/api/cep` 30/min.
+
+**Security headers:** Flask-Talisman is activated only when `config_name == 'production'` inside `create_app()`. The CSP whitelist covers Leaflet (unpkg.com), Google Fonts, and OSM tiles. Do not enable Talisman in dev/testing — it interferes with test client redirects.
+
+**Production config (`FLASK_CONFIG=production`):** `ProductionConfig.init_app()` raises `RuntimeError` at startup if `SECRET_KEY` or `DATABASE_URL` are missing. Cookies gain `Secure=True`. Never run production without setting these env vars.
+
+**Environment variable:** Use `FLASK_CONFIG` (not `FLASK_ENV`, which was removed in Flask 2.3). Valid values: `development` (default), `testing`, `production`.
+
+**Security logging:** `logging.getLogger('petpost.security')` in `auth.py` records login success/failure, blocked accounts, registrations, and logouts with `user_id` + `ip`. Wire it to a file handler or syslog in production.
+
+**Logout is POST-only** (`/auth/logout`). Templates use a `<form>` with `csrf_token()`. The test suite uses `client.post('/auth/logout', ...)`.
 
 ## Git conventions
 

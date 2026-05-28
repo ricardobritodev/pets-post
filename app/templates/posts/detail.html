@@ -172,21 +172,30 @@
         </dl>
       </div>
 
-      {# Card de contato #}
+      {# Card de contato — visível apenas para usuários autenticados #}
       <div class="form-card" style="margin-bottom: var(--space-md); border: 2px solid var(--color-primary);">
         <h3 style="font-size: 1rem; margin-bottom: var(--space-md); color: var(--color-primary);">📞 Entrar em contato</h3>
 
-        <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
-          <a href="tel:{{ post.contact_phone }}" class="btn btn--primary btn--full">
-            📱 {{ post.contact_phone }}
-          </a>
-
-          {% if post.contact_email %}
-            <a href="mailto:{{ post.contact_email }}" class="btn btn--outline btn--full">
-              ✉️ Enviar email
+        {% if current_user.is_authenticated %}
+          <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+            <a href="tel:{{ post.contact_phone }}" class="btn btn--primary btn--full">
+              📱 {{ post.contact_phone }}
             </a>
-          {% endif %}
-        </div>
+
+            {% if post.contact_email %}
+              <a href="mailto:{{ post.contact_email }}" class="btn btn--outline btn--full">
+                ✉️ Enviar email
+              </a>
+            {% endif %}
+          </div>
+        {% else %}
+          <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: var(--space-md);">
+            Faça login para ver as informações de contato.
+          </p>
+          <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn--primary btn--full">
+            🔒 Entrar para ver o contato
+          </a>
+        {% endif %}
       </div>
 
       {# Recompensa #}

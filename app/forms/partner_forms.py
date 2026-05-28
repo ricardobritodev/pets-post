@@ -56,7 +56,11 @@ class PartnerForm(FlaskForm):
 
     website = StringField(
         'Site (opcional)',
-        validators=[Optional(), Length(max=255)],
+        validators=[
+            Optional(),
+            URL(message='Informe uma URL válida (deve começar com http:// ou https://).'),
+            Length(max=255),
+        ],
         render_kw={'placeholder': 'https://...'}
     )
 

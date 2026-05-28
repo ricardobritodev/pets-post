@@ -5,72 +5,20 @@ Blueprint responsável pelo CRUD (Create, Read, Update, Delete) de posts.
 """
 
 import os
-import uuid
 from flask import (
     Blueprint, render_template, redirect, url_for,
     flash, request, abort, current_app
 )
 from flask_login import login_required, current_user
-from PIL import Image
 
 from app.extensions import db
 from app.models.pet_post import PetPost
 from app.models.photo import Photo
 from app.forms.post_forms import PetPostForm
 from app.services.geocoding import geocode_address
+from app.utils.upload import allowed_file, save_photo
 
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
-
-
-def allowed_file(filename):
-    """Verifica se a extensão do arquivo é permitida."""
-    return (
-        '.' in filename
-        and filename.rsplit('.', 1)[1].lower()
-        in current_app.config['ALLOWED_EXTENSIONS']
-    )
-
-
-def save_photo(file_storage):
-    """
-    Salva uma foto enviada pelo usuário.
-
-    1. Gera um nome de arquivo único com UUID para evitar conflitos
-    2. Redimensiona para no máximo 800px de largura (economia de espaço)
-    3. Salva em app/static/uploads/
-    4. Retorna o nome do arquivo salvo
-
-    Parâmetros:
-        file_storage: objeto FileStorage do Werkzeug (vindo do formulário)
-    """
-    # Pega a extensão original do arquivo (ex: .jpg, .png)
-    ext = file_storage.filename.rsplit('.', 1)[1].lower()
-
-    # Gera um nome único para evitar sobreposição de arquivos
-    filename = f"{uuid.uuid4().hex}.{ext}"
-
-    # Caminho completo onde o arquivo será salvo
-    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
-    filepath = os.path.join(upload_folder, filename)
-
-    # Abre a imagem com Pillow para redimensionar
-    img = Image.open(file_storage)
-
-    # Converte para RGB se necessário (ex: PNG com transparência)
-    if img.mode in ('RGBA', 'P'):
-        img = img.convert('RGB')
-
-    # Redimensiona mantendo a proporção — máximo 800px de largura
-    max_width = 800
-    if img.width > max_width:
-        ratio = max_width / img.width
-        new_size = (max_width, int(img.height * ratio))
-        img = img.resize(new_size, Image.LANCZOS)
-
-    # Salva o arquivo
-    img.save(filepath, quality=85, optimize=True)
-
-    return filename
 
 
 @posts_bp.route('/')
@@ -187,7 +135,8 @@ def create():
                         db.session.add(photo)
                         is_first = False
                     except Exception as e:
-                        flash(f'Erro ao salvar foto: {str(e)}', 'warning')
+                        current_app.logger.warning('Erro ao salvar foto: %s', e)
+                        flash('Não foi possível salvar uma das fotos. Tente novamente.', 'warning')
 
         db.session.commit()
 
@@ -255,7 +204,8 @@ def edit(post_id):
                         db.session.add(photo)
                         current_count += 1
                     except Exception as e:
-                        flash(f'Erro ao salvar foto: {str(e)}', 'warning')
+                        current_app.logger.warning('Erro ao salvar foto: %s', e)
+                        flash('Não foi possível salvar uma das fotos. Tente novamente.', 'warning')
 
         db.session.commit()
 

@@ -1,46 +1,18 @@
 import os
-import uuid
 from flask import (
     Blueprint, render_template, redirect, url_for,
     flash, request, abort, current_app
 )
 from flask_login import login_required, current_user
-from PIL import Image
 
 from app.extensions import db
 from app.models.adoption_post import AdoptionPost
 from app.models.adoption_photo import AdoptionPhoto
 from app.forms.adoption_forms import AdoptionForm
 from app.services.geocoding import geocode_address
+from app.utils.upload import allowed_file, save_photo
 
 adoption_bp = Blueprint('adoption', __name__, url_prefix='/adocao')
-
-
-def allowed_file(filename):
-    return (
-        '.' in filename
-        and filename.rsplit('.', 1)[1].lower()
-        in current_app.config['ALLOWED_EXTENSIONS']
-    )
-
-
-def save_photo(file_storage):
-    ext = file_storage.filename.rsplit('.', 1)[1].lower()
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
-    filepath = os.path.join(upload_folder, filename)
-
-    img = Image.open(file_storage)
-    if img.mode in ('RGBA', 'P'):
-        img = img.convert('RGB')
-
-    max_width = 800
-    if img.width > max_width:
-        ratio = max_width / img.width
-        img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
-
-    img.save(filepath, quality=85, optimize=True)
-    return filename
 
 
 @adoption_bp.route('/')
@@ -123,7 +95,8 @@ def create():
                         db.session.add(photo)
                         is_first = False
                     except Exception as e:
-                        flash(f'Erro ao salvar foto: {str(e)}', 'warning')
+                        current_app.logger.warning('Erro ao salvar foto: %s', e)
+                        flash('Não foi possível salvar uma das fotos. Tente novamente.', 'warning')
 
         db.session.commit()
 
@@ -184,7 +157,8 @@ def edit(post_id):
                         db.session.add(photo)
                         current_count += 1
                     except Exception as e:
-                        flash(f'Erro ao salvar foto: {str(e)}', 'warning')
+                        current_app.logger.warning('Erro ao salvar foto: %s', e)
+                        flash('Não foi possível salvar uma das fotos. Tente novamente.', 'warning')
 
         db.session.commit()
 

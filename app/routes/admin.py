@@ -21,19 +21,17 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 def admin_required(f):
     """
-    Decorator customizado que verifica se o usuário é admin.
+    Decorator que verifica autenticação e role admin.
 
-    Como usar:
-        @admin_bp.route('/alguma-rota')
-        @login_required
-        @admin_required
-        def minha_rota():
-            ...
+    Autossuficiente: não depende de @login_required estar empilhado antes.
+    Retorna 401 para não autenticados, 403 para usuários sem role admin.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            abort(401)
         if not current_user.is_admin():
-            abort(403)  # Acesso proibido
+            abort(403)
         return f(*args, **kwargs)
     return decorated_function
 

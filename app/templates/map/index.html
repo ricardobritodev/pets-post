@@ -129,7 +129,7 @@
     html += '<div style="font-size:0.875rem;color:#555;">📍 ' + p.address + '</div>';
     if (p.phone) html += '<div style="font-size:0.875rem;margin-top:4px;">📱 <a href="tel:' + p.phone + '">' + p.phone + '</a></div>';
     if (p.email) html += '<div style="font-size:0.875rem;margin-top:4px;">✉️ <a href="mailto:' + p.email + '">' + p.email + '</a></div>';
-    if (p.website) html += '<div style="font-size:0.875rem;margin-top:4px;">🌐 <a href="' + p.website + '" target="_blank" rel="noopener">Visitar site</a></div>';
+    if (p.website && /^https?:\/\//i.test(p.website)) html += '<div style="font-size:0.875rem;margin-top:4px;">🌐 <a href="' + p.website + '" target="_blank" rel="noopener noreferrer">Visitar site</a></div>';
     html += '<div style="margin-top:8px;">';
     html += '<a href="https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '" target="_blank" rel="noopener" style="font-size:0.8rem;color:#2563eb;">Como chegar →</a>';
     html += '</div></div>';

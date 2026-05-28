@@ -4,6 +4,8 @@ import urllib.request
 
 from flask import Blueprint, jsonify
 
+from app.extensions import limiter
+
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 _CEP_RE = re.compile(r'^\d{8}$')
@@ -12,6 +14,7 @@ _ALLOWED_FIELDS = ('logradouro', 'bairro', 'localidade', 'uf')
 
 
 @api_bp.route('/cep/<cep>')
+@limiter.limit("30 per minute")
 def lookup_cep(cep):
     clean = re.sub(r'\D', '', cep)
     if not _CEP_RE.match(clean):

@@ -96,9 +96,12 @@
               </li>
             {% endif %}
             <li>
-              <a href="{{ url_for('auth.logout') }}">
-                Sair ({{ current_user.name.split()[0] }})
-              </a>
+              <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline; margin:0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="navbar__logout-btn">
+                  Sair ({{ current_user.name.split()[0] }})
+                </button>
+              </form>
             </li>
           {% else %}
             <li>
@@ -180,7 +183,12 @@
           <h4 class="footer__title">Conta</h4>
           <ul class="footer__links">
             {% if current_user.is_authenticated %}
-              <li><a href="{{ url_for('auth.logout') }}">Sair</a></li>
+              <li>
+                <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline; margin:0;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="footer__logout-btn">Sair</button>
+                </form>
+              </li>
             {% else %}
               <li><a href="{{ url_for('auth.login') }}">Entrar</a></li>
               <li><a href="{{ url_for('auth.register') }}">Criar conta</a></li>

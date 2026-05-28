@@ -137,14 +137,12 @@ def test_login_nonexistent_email(client):
 # -----------------------------------------------
 
 def test_logout_redirects(client, user):
-    """Logout deve redirecionar para a home."""
-    # Primeiro faz login
+    """Logout deve redirecionar para a home (agora via POST; CSRF desativado em testes)."""
     client.post('/auth/login', data={
         'email': 'joao@teste.com',
         'password': 'Senha@123',
     })
-    # Depois faz logout
-    response = client.get('/auth/logout', follow_redirects=True)
+    response = client.post('/auth/logout', follow_redirects=True)
     assert response.status_code == 200
 
 
