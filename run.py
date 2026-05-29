@@ -132,6 +132,7 @@ def geocode_partners():
 
 
 if __name__ == '__main__':
-    # debug=True recarrega o servidor automaticamente ao salvar arquivos
-    # NÃO use debug=True em produção!
-    app.run(debug=True)
+    # debug só ativa em desenvolvimento — nunca em produção
+    import os
+    is_dev = os.environ.get('FLASK_CONFIG', 'development') == 'development'
+    app.run(debug=is_dev)
