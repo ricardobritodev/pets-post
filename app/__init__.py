@@ -15,6 +15,7 @@ import os
 from datetime import datetime
 from flask import Flask
 from flask_talisman import Talisman
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.config import config
 from app.extensions import db, login_manager, migrate, csrf, limiter
@@ -66,6 +67,11 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
     csrf.init_app(app)
     limiter.init_app(app)
+
+    # ProxyFix: faz o Flask enxergar o IP real do cliente quando roda atrás do Nginx.
+    # Sem isso, request.remote_addr e o rate limiting veem o IP do próprio Nginx.
+    if config_name == 'production':
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     # Security headers — apenas em produção para não quebrar dev/testes
     if config_name == 'production':
