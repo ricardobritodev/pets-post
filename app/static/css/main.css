@@ -667,6 +667,20 @@ textarea { resize: vertical; }
 
 .btn--danger:hover { filter: brightness(0.9); }
 
+/* Botão WhatsApp */
+.btn--whatsapp {
+  background-color: #25D366;
+  border-color: #25D366;
+  color: white;
+  font-weight: 600;
+}
+
+.btn--whatsapp:hover {
+  background-color: #1ebe57;
+  border-color: #1ebe57;
+  color: white;
+}
+
 /* Botão fantasma — sem borda, apenas texto */
 .btn--ghost {
   background: transparent;

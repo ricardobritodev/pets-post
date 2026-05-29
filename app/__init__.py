@@ -117,6 +117,12 @@ def create_app(config_name=None):
     app.register_blueprint(api_bp)
 
     # -----------------------------------------------
+    # Filtros Jinja2 customizados
+    # -----------------------------------------------
+    from app.utils.phone import to_whatsapp_url
+    app.jinja_env.filters['whatsapp_url'] = to_whatsapp_url
+
+    # -----------------------------------------------
     # Variáveis globais disponíveis em todos os templates
     # -----------------------------------------------
     @app.context_processor

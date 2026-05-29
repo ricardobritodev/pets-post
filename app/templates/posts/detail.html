@@ -177,10 +177,21 @@
         <h3 style="font-size: 1rem; margin-bottom: var(--space-md); color: var(--color-primary);">📞 Entrar em contato</h3>
 
         {% if current_user.is_authenticated %}
+          {% set wa_message = "Olá! Vi seu anúncio no PetPost:\n*" ~ post.status_label ~ " — " ~ (post.pet_name or post.pet_type_label) ~ "*\nGostaria de saber mais informações. 🐾" %}
+          {% set wa_url = post.contact_phone | whatsapp_url(wa_message) %}
           <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
             <a href="tel:{{ post.contact_phone }}" class="btn btn--primary btn--full">
               📱 {{ post.contact_phone }}
             </a>
+
+            {% if wa_url %}
+              <a href="{{ wa_url }}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="btn btn--whatsapp btn--full">
+                💬 Chamar no WhatsApp
+              </a>
+            {% endif %}
 
             {% if post.contact_email %}
               <a href="mailto:{{ post.contact_email }}" class="btn btn--outline btn--full">
