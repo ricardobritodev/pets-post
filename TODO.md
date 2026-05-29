@@ -167,17 +167,17 @@
   - **Arquivos:** `tests/test_auth.py` e `tests/test_posts.py`
   - **Comando:** `pytest -v`
 
-- [ ] **B-13 · Integração com API de CEP (ViaCEP)**
+- [x] **B-13 · Integração com API de CEP (ViaCEP)**
   - Preencher endereço automaticamente ao informar o CEP no formulário de post
   - **Dica:** `ViaCEP API Python requests`, `Flask AJAX endpoint`, `JavaScript fetch CEP`
   - **URL da API:** `https://viacep.com.br/ws/{CEP}/json/`
 
-- [ ] **B-14 · Módulo de Adoção**
+- [x] **B-14 · Módulo de Adoção**
   - Model `AdoptionPost`, rotas CRUD, lógica de matching entre adotantes
   - **Arquivos:** `app/models/adoption_post.py` e `app/routes/adoption.py`
   - **Dica:** Reutilizar o padrão de `pet_post.py`
 
-- [ ] **B-15 · Módulo de Lares Temporários e Petshops**
+- [x] **B-15 · Módulo de Lares Temporários e Petshops**
   - Models `TemporaryHome` e `Petshop` com localização, endpoint `/api/map/locations`
   - **Dica:** `SQLAlchemy geographic queries`, `Haversine formula`, `Flask JSON API`
 
@@ -190,7 +190,7 @@
   - Sistema de mensagens entre quem encontrou o pet e o dono
   - **Dica:** `Flask-SocketIO WebSocket`, ou mensagens simples via banco de dados
 
-- [ ] **B-18 · Integração com WhatsApp**
+- [x] **B-18 · Integração com WhatsApp**
   - Botão de contato direto via WhatsApp na página de detalhe do post
   - **Dica:** `WhatsApp API link wa.me`, `Flask template tag WA`
 

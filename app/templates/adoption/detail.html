@@ -27,9 +27,9 @@
 
       <div class="pet-card__badges" style="margin-bottom: var(--space-md);">
         {% if post.is_adopted %}
-          <span class="badge badge--resolved" style="font-size: 0.875rem; padding: 0.375rem 0.875rem;">✅ Já foi adotado!</span>
+          <span class="badge badge--resolved" style="font-size: 0.875rem; padding: 0.375rem 0.875rem;">{{ icon("check-circle", size=13) }} Adotado!</span>
         {% else %}
-          <span class="badge badge--found" style="font-size: 0.875rem; padding: 0.375rem 0.875rem;">💚 Disponível para adoção</span>
+          <span class="badge badge--found" style="font-size: 0.875rem; padding: 0.375rem 0.875rem;">{{ icon("heart", size=13) }} Disponível para adoção</span>
         {% endif %}
 
         <span class="badge" style="background: #f0f0f0; color: #555; font-size: 0.875rem; padding: 0.375rem 0.875rem;">
@@ -37,10 +37,10 @@
         </span>
 
         {% if post.is_neutered %}
-          <span class="badge" style="background: #e8f5e9; color: #2e7d32; font-size: 0.875rem; padding: 0.375rem 0.875rem;">✂️ Castrado</span>
+          <span class="badge" style="background: #e8f5e9; color: #2e7d32; font-size: 0.875rem; padding: 0.375rem 0.875rem;">{{ icon("scissors", size=11) }} Castrado</span>
         {% endif %}
         {% if post.is_vaccinated %}
-          <span class="badge" style="background: #e3f2fd; color: #1565c0; font-size: 0.875rem; padding: 0.375rem 0.875rem;">💉 Vacinado</span>
+          <span class="badge" style="background: #e3f2fd; color: #1565c0; font-size: 0.875rem; padding: 0.375rem 0.875rem;">{{ icon("shield-check", size=11) }} Vacinado</span>
         {% endif %}
       </div>
 
@@ -74,10 +74,10 @@
 
       {% else %}
         <div class="gallery-placeholder" style="margin-bottom: var(--space-lg);">
-          {% if post.pet_type == 'dog' %}🐶
-          {% elif post.pet_type == 'cat' %}🐱
-          {% elif post.pet_type == 'bird' %}🐦
-          {% else %}🐾{% endif %}
+          {% if post.pet_type == 'dog' %}{{ icon("dog", size=64) }}
+          {% elif post.pet_type == 'cat' %}{{ icon("cat", size=64) }}
+          {% elif post.pet_type == 'bird' %}{{ icon("bird", size=64) }}
+          {% else %}{{ icon("paw", size=64) }}{% endif %}
         </div>
       {% endif %}
 
@@ -95,7 +95,7 @@
       {# Requisitos do adotante #}
       {% if post.adopter_requirements %}
         <div class="form-card" style="margin-bottom: var(--space-md); border-left: 4px solid var(--color-warning, #f59e0b);">
-          <h2 style="font-size: 1.125rem; margin-bottom: var(--space-sm);">⚠️ Requisitos para adoção</h2>
+          <h2 style="font-size: 1.125rem; margin-bottom: var(--space-sm);">{{ icon("warning", size=16) }} Requisitos para adoção</h2>
           <p style="white-space: pre-line; line-height: 1.7;">{{ post.adopter_requirements }}</p>
         </div>
       {% endif %}
@@ -104,7 +104,7 @@
       {% if current_user.is_authenticated and (current_user.id == post.user_id or current_user.is_admin()) %}
         <div class="post-actions">
           <a href="{{ url_for('adoption.edit', post_id=post.id) }}" class="btn btn--outline btn--sm">
-            ✏️ Editar
+            {{ icon("pencil", size=15) }} Editar
           </a>
 
           {% if not post.is_adopted %}
@@ -112,7 +112,7 @@
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="btn btn--secondary btn--sm"
                       onclick="return confirm('Marcar este pet como adotado? 🎉')">
-                ✅ Marcar como Adotado
+                {{ icon("check-circle", size=15) }} Marcar como Adotado
               </button>
             </form>
           {% endif %}
@@ -121,7 +121,7 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn--danger btn--sm"
                     onclick="return confirm('Tem certeza que deseja excluir este anúncio? Esta ação não pode ser desfeita.')">
-              🗑️ Excluir
+              {{ icon("trash", size=15) }} Excluir
             </button>
           </form>
         </div>
@@ -133,7 +133,7 @@
     <div>
 
       <div class="form-card" style="margin-bottom: var(--space-md);">
-        <h3 style="font-size: 1rem; margin-bottom: var(--space-md);">🐾 Informações do pet</h3>
+        <h3 style="font-size: 1rem; margin-bottom: var(--space-md);">{{ icon("paw", size=16) }} Informações do pet</h3>
         <dl class="info-list">
 
           {% if post.pet_name %}
@@ -186,7 +186,7 @@
 
           <div>
             <dt>Localização</dt>
-            <dd>📍 {{ post.location }}</dd>
+            <dd>{{ icon("map-pin", size=14) }} {{ post.location }}</dd>
           </div>
 
           <div>
@@ -199,14 +199,14 @@
 
       {# Card de contato — visível apenas para usuários autenticados #}
       <div class="form-card" style="margin-bottom: var(--space-md); border: 2px solid var(--color-primary);">
-        <h3 style="font-size: 1rem; margin-bottom: var(--space-md); color: var(--color-primary);">📞 Tenho interesse em adotar</h3>
+        <h3 style="font-size: 1rem; margin-bottom: var(--space-md); color: var(--color-primary);">{{ icon("phone", size=16) }} Tenho interesse em adotar</h3>
 
         {% if current_user.is_authenticated %}
-          {% set wa_message = "Olá! Vi seu anúncio no PetPost:\n*Adoção — " ~ (post.pet_name or post.pet_type_label) ~ "*\nTenho interesse em adotar. 🐾" %}
+          {% set wa_message = "Olá! Vi seu anúncio no Pets Post:\n*Adoção — " ~ (post.pet_name or post.pet_type_label) ~ "*\nTenho interesse em adotar. 🐾" %}
           {% set wa_url = post.contact_phone | whatsapp_url(wa_message) %}
           <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
             <a href="tel:{{ post.contact_phone }}" class="btn btn--primary btn--full">
-              📱 {{ post.contact_phone }}
+              {{ icon("phone", size=16) }} {{ post.contact_phone }}
             </a>
 
             {% if wa_url %}
@@ -214,13 +214,13 @@
                  target="_blank"
                  rel="noopener noreferrer"
                  class="btn btn--whatsapp btn--full">
-                💬 Chamar no WhatsApp
+                {{ icon("chat", size=16) }} Chamar no WhatsApp
               </a>
             {% endif %}
 
             {% if post.contact_email %}
               <a href="mailto:{{ post.contact_email }}" class="btn btn--outline btn--full">
-                ✉️ Enviar email
+                {{ icon("envelope", size=16) }} Enviar email
               </a>
             {% endif %}
           </div>
@@ -229,7 +229,7 @@
             Faça login para ver as informações de contato.
           </p>
           <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn--primary btn--full">
-            🔒 Entrar para ver o contato
+            {{ icon("lock", size=16) }} Entrar para ver o contato
           </a>
         {% endif %}
       </div>

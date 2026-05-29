@@ -22,7 +22,7 @@ def lookup_cep(cep):
 
     req = urllib.request.Request(
         _VIACEP_URL.format(clean),
-        headers={'User-Agent': 'PetPost/1.0 (projeto-academico)'},
+        headers={'User-Agent': 'PetsPost/1.0 (projeto-academico)'},
     )
     try:
         with urllib.request.urlopen(req, timeout=5) as response:

@@ -3,50 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="PetPost — Plataforma para localização de pets perdidos. Ajude pets a voltarem para casa.">
+  <meta name="description" content="Pets Post — Plataforma para localização de pets perdidos. Ajude pets a voltarem para casa.">
 
-  <title>{% block title %}{% if title %}{{ title }} | PetPost{% else %}PetPost{% endif %}{% endblock %}</title>
+  <title>{% block title %}{% if title %}{{ title }} | Pets Post{% else %}Pets Post{% endif %}{% endblock %}</title>
 
-  {# Google Fonts — Inter para tipografia moderna e legível #}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  {# CSS principal da aplicação #}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-
-  {# Bloco para CSS adicional específico de cada página #}
   {% block extra_css %}{% endblock %}
 </head>
 <body>
 
 <div class="page-wrapper">
 
-  {# ===================================================
-     NAVBAR — Barra de navegação superior
-     =================================================== #}
+  {# =========================================================
+     NAVBAR — 3 colunas: logo | nav central | auth/CTA
+     ========================================================= #}
   <nav class="navbar">
     <div class="container">
       <div class="navbar__inner">
 
-        {# Logo #}
+        {# ── Coluna 1: Logo ── #}
         <a href="{{ url_for('main.index') }}" class="navbar__brand">
-          <span class="navbar__logo-icon">🐾</span>
-          PetPost
+          <span class="navbar__logo-icon">{{ icon('paw', size=22) }}</span>
+          <span class="navbar__brand-name">
+            <span>Pets Post</span>
+            <span>Encontre pets perdidos</span>
+          </span>
         </a>
 
-        {# Botão hambúrguer — visível apenas em mobile #}
-        <button class="navbar__toggle"
-                aria-expanded="false"
-                aria-controls="navbar-nav"
-                aria-label="Abrir menu de navegação">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        {# Menu de navegação #}
-        <ul class="navbar__nav" id="navbar-nav">
+        {# ── Coluna 2: Navegação central (desktop) ── #}
+        <ul class="navbar__nav" id="navbar-nav" role="list">
           <li>
             <a href="{{ url_for('main.index') }}"
                class="{{ 'active' if request.endpoint == 'main.index' }}">
@@ -71,72 +59,95 @@
               Mapa
             </a>
           </li>
-          <li>
-            <a href="{{ url_for('main.about') }}"
-               class="{{ 'active' if request.endpoint == 'main.about' }}">
-              Sobre
-            </a>
-          </li>
-
-          {# Botão especial — aparece mesmo sem estar logado #}
-          <li>
-            <a href="{{ url_for('posts.create') }}" class="btn-nav-cta">
-              + Encontrei um Pet
-            </a>
-          </li>
-
-          {# Menu condicional: mostra Login/Cadastro ou nome do usuário #}
-          {% if current_user.is_authenticated %}
-            {% if current_user.is_admin() %}
-              <li>
-                <a href="{{ url_for('admin.dashboard') }}"
-                   class="{{ 'active' if request.blueprint == 'admin' }}">
-                  ⚙️ Admin
-                </a>
-              </li>
-            {% endif %}
-            <li>
-              <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline; margin:0;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="navbar__logout-btn">
-                  Sair ({{ current_user.name.split()[0] }})
-                </button>
-              </form>
-            </li>
-          {% else %}
-            <li>
-              <a href="{{ url_for('auth.login') }}"
-                 class="{{ 'active' if request.endpoint == 'auth.login' }}">
-                Entrar
-              </a>
-            </li>
-            <li>
-              <a href="{{ url_for('auth.register') }}"
-                 class="{{ 'active' if request.endpoint == 'auth.register' }}">
-                Cadastrar
-              </a>
-            </li>
-          {% endif %}
         </ul>
 
+        {# ── Coluna 3: Ações (desktop) ── #}
+        <div class="navbar__actions">
+          <a href="{{ url_for('posts.create') }}" class="navbar__cta">
+            + Encontrei um Pet
+          </a>
+
+          {% if current_user.is_authenticated %}
+            {% if current_user.is_admin() %}
+              <a href="{{ url_for('admin.dashboard') }}"
+                 class="navbar__admin-link {{ 'active' if request.blueprint == 'admin' }}">
+                {{ icon('cog', size=16) }} Admin
+              </a>
+            {% endif %}
+            <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="navbar__logout-btn">
+                Sair ({{ current_user.name.split()[0] }})
+              </button>
+            </form>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}"
+               class="navbar__auth-link {{ 'active' if request.endpoint == 'auth.login' }}">
+              Entrar
+            </a>
+            <a href="{{ url_for('auth.register') }}"
+               class="navbar__auth-link navbar__auth-link--register {{ 'active' if request.endpoint == 'auth.register' }}">
+              Cadastrar
+            </a>
+          {% endif %}
+        </div>
+
+        {# ── Hambúrguer (mobile) ── #}
+        <button class="navbar__toggle"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+                aria-label="Abrir menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
       </div>
+
+      {# ── Dropdown mobile ── #}
+      <div class="navbar__mobile-menu" id="mobile-menu" role="navigation" aria-label="Menu mobile">
+        <a href="{{ url_for('main.index') }}"
+           class="{{ 'active' if request.endpoint == 'main.index' }}">Início</a>
+        <a href="{{ url_for('posts.list_posts') }}"
+           class="{{ 'active' if request.blueprint == 'posts' }}">Posts</a>
+        <a href="{{ url_for('adoption.list_posts') }}"
+           class="{{ 'active' if request.blueprint == 'adoption' }}">Adoção</a>
+        <a href="{{ url_for('map.index') }}"
+           class="{{ 'active' if request.blueprint == 'map' }}">Mapa</a>
+
+        <div class="mobile-divider"></div>
+
+        {% if current_user.is_authenticated %}
+          {% if current_user.is_admin() %}
+            <a href="{{ url_for('admin.dashboard') }}"
+               class="{{ 'active' if request.blueprint == 'admin' }}">{{ icon('cog', size=16) }} Admin</a>
+          {% endif %}
+          <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Sair ({{ current_user.name.split()[0] }})</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}"
+             class="{{ 'active' if request.endpoint == 'auth.login' }}">Entrar</a>
+          <a href="{{ url_for('auth.register') }}"
+             class="{{ 'active' if request.endpoint == 'auth.register' }}">Cadastrar</a>
+        {% endif %}
+
+        <a href="{{ url_for('posts.create') }}" class="mobile-cta">+ Encontrei um Pet</a>
+      </div>
+
     </div>
   </nav>
 
-  {# ===================================================
-     FLASH MESSAGES — Notificações de ação
-     Ex: "Post criado com sucesso!", "Email incorreto"
-     =================================================== #}
+  {# =========================================================
+     FLASH MESSAGES
+     ========================================================= #}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="flash-messages">
         {% for category, message in messages %}
           <div class="flash flash--{{ category }}">
-            <span>
-              {# Ícone de acordo com o tipo de mensagem #}
-              {% if category == 'success' %}✅{% elif category == 'danger' %}❌{% elif category == 'warning' %}⚠️{% else %}ℹ️{% endif %}
-              {{ message }}
-            </span>
+            <span>{{ message }}</span>
             <button class="flash__close" aria-label="Fechar">&times;</button>
           </div>
         {% endfor %}
@@ -144,47 +155,44 @@
     {% endif %}
   {% endwith %}
 
-  {# ===================================================
-     CONTEÚDO PRINCIPAL — Cada página preenche este bloco
-     =================================================== #}
+  {# =========================================================
+     CONTEÚDO PRINCIPAL
+     ========================================================= #}
   <main>
     {% block content %}{% endblock %}
   </main>
 
-  {# ===================================================
-     FOOTER — Rodapé
-     =================================================== #}
+  {# =========================================================
+     FOOTER
+     ========================================================= #}
   <footer class="footer">
     <div class="container">
       <div class="footer__grid">
 
-        {# Coluna 1: Sobre o projeto #}
         <div>
-          <span class="footer__brand">🐾 PetPost</span>
+          <span class="footer__brand">{{ icon('paw', size=18) }} Pets Post</span>
           <p class="footer__tagline">
             Conectando pessoas que encontraram pets perdidos com seus donos.
-            Juntos, ajudamos famílias a reencontrar seus companheiros.
+            Juntos ajudamos famílias a reencontrar seus companheiros.
           </p>
         </div>
 
-        {# Coluna 2: Links rápidos #}
         <div>
           <h4 class="footer__title">Navegação</h4>
           <ul class="footer__links">
             <li><a href="{{ url_for('main.index') }}">Início</a></li>
-            <li><a href="{{ url_for('posts.list_posts') }}">Ver todos os posts</a></li>
-            <li><a href="{{ url_for('posts.create') }}">Criar anúncio</a></li>
-            <li><a href="{{ url_for('main.about') }}">Sobre o projeto</a></li>
+            <li><a href="{{ url_for('posts.list_posts') }}">Ver posts</a></li>
+            <li><a href="{{ url_for('adoption.list_posts') }}">Adoção</a></li>
+            <li><a href="{{ url_for('map.index') }}">Mapa</a></li>
           </ul>
         </div>
 
-        {# Coluna 3: Conta #}
         <div>
           <h4 class="footer__title">Conta</h4>
           <ul class="footer__links">
             {% if current_user.is_authenticated %}
               <li>
-                <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline; margin:0;">
+                <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline;margin:0;">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit" class="footer__logout-btn">Sair</button>
                 </form>
@@ -198,19 +206,15 @@
 
       </div>
 
-      {# Linha final com copyright #}
       <div class="footer__bottom">
-        <p>&copy; {{ current_year }} PetPost — Projeto acadêmico. Desenvolvido com 🧡 pela equipe.</p>
+        <p>&copy; {{ current_year }} Pets Post — Projeto acadêmico.</p>
       </div>
     </div>
   </footer>
 
-</div>{# fim .page-wrapper #}
+</div>
 
-{# JavaScript principal #}
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-{# Bloco para JS adicional específico de cada página #}
 {% block extra_js %}{% endblock %}
 
 </body>

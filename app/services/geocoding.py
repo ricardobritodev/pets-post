@@ -21,7 +21,7 @@ import urllib.parse
 import urllib.request
 
 _NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search'
-_USER_AGENT = 'PetPost/1.0 (projeto-academico; contato: admin@petpost.com)'
+_USER_AGENT = 'PetsPost/1.0 (projeto-academico; contato: admin@petspost.com)'
 _TIMEOUT_S = 5
 
 

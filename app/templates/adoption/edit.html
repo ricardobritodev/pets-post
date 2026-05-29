@@ -54,7 +54,7 @@
 
     {# SEÇÃO 2: Características do pet #}
     <div class="form-section">
-      <h3 class="form-section__title">🐾 Características do pet</h3>
+      <h3 class="form-section__title">{{ icon("paw", size=16) }} Características do pet</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -76,13 +76,13 @@
         <div class="form-group">
           <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; font-weight: 500;">
             {{ form.is_neutered() }}
-            ✂️ Castrado
+            {{ icon("scissors", size=16) }} Castrado
           </label>
         </div>
         <div class="form-group">
           <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; font-weight: 500;">
             {{ form.is_vaccinated() }}
-            💉 Vacinado
+            {{ icon("shield-check", size=16) }} Vacinado
           </label>
         </div>
       </div>
@@ -90,7 +90,7 @@
 
     {# SEÇÃO 3: Requisitos para o adotante #}
     <div class="form-section">
-      <h3 class="form-section__title">⚠️ Requisitos para o adotante</h3>
+      <h3 class="form-section__title">{{ icon("warning", size=16) }} Requisitos para o adotante</h3>
 
       <div class="form-group">
         {{ form.adopter_requirements.label }}
@@ -101,7 +101,7 @@
 
     {# SEÇÃO 4: Localização #}
     <div class="form-section">
-      <h3 class="form-section__title">📍 Localização</h3>
+      <h3 class="form-section__title">{{ icon("map-pin", size=16) }} Localização</h3>
 
       <div class="form-group">
         {{ form.cep.label }}

@@ -1,5 +1,5 @@
 /**
- * main.js — Scripts Globais do PetPost
+ * main.js — Scripts Globais do Pets Post
  */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -213,25 +213,27 @@ function fetchGrid(url, pushState) {
 // ================================================================
 
 function initHamburgerMenu() {
-  var navbar  = document.querySelector('.navbar');
-  var toggle  = document.querySelector('.navbar__toggle');
-  var nav     = document.getElementById('navbar-nav');
+  var navbar     = document.querySelector('.navbar');
+  var toggle     = document.querySelector('.navbar__toggle');
+  var mobileMenu = document.getElementById('mobile-menu');
 
-  if (!toggle || !nav) return;
+  if (!toggle) return;
 
   // 1. Abre/fecha ao clicar no botão
   toggle.addEventListener('click', function (e) {
-    e.stopPropagation(); // impede que o click chegue ao document listener
+    e.stopPropagation();
     var willOpen = !navbar.classList.contains('is-open');
     setMenuState(willOpen);
   });
 
-  // 2. Fecha ao clicar em qualquer link do menu
-  nav.addEventListener('click', function (e) {
-    if (e.target.tagName === 'A') {
-      setMenuState(false);
-    }
-  });
+  // 2. Fecha ao clicar em qualquer link ou botão do menu mobile
+  if (mobileMenu) {
+    mobileMenu.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+        setMenuState(false);
+      }
+    });
+  }
 
   // 3. Fecha ao clicar fora da navbar
   document.addEventListener('click', function (e) {

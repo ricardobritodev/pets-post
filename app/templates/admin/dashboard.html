@@ -5,7 +5,7 @@
 
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <h1>⚙️ Painel Administrativo</h1>
+      <h1>{{ icon("cog", size=24) }} Painel Administrativo</h1>
       <p class="text-muted">Gerencie usuários e posts da plataforma.</p>
     </div>
     <div class="admin-nav">
@@ -178,7 +178,7 @@
                   <button type="submit" class="btn btn--ghost btn--sm"
                           onclick="return confirm('{{ 'Desativar' if user.is_active else 'Ativar' }} o usuário {{ user.name }}?')"
                           style="font-size: 0.8rem;">
-                    {{ '🔴 Desativar' if user.is_active else '🟢 Ativar' }}
+                    {{ icon('x-circle', size=14) ~ ' Desativar' if user.is_active else icon('check-circle', size=14) ~ ' Ativar' }}
                   </button>
                 </form>
               {% else %}
@@ -234,7 +234,7 @@
             </td>
             <td>
               <a href="{{ url_for('posts.edit', post_id=post.id) }}" class="btn btn--ghost btn--sm" style="font-size: 0.8rem;">
-                ✏️ Editar
+                {{ icon("pencil", size=15) }} Editar
               </a>
             </td>
           </tr>
@@ -286,12 +286,12 @@
               {% endif %}
             </td>
             <td style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-              <a href="{{ url_for('admin.partner_edit', partner_id=partner.id) }}" class="btn btn--ghost btn--sm">✏️ Editar</a>
+              <a href="{{ url_for('admin.partner_edit', partner_id=partner.id) }}" class="btn btn--ghost btn--sm">{{ icon("pencil", size=15) }} Editar</a>
               <form method="POST" action="{{ url_for('admin.partner_delete', partner_id=partner.id) }}" style="display:inline;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn--ghost btn--sm"
                         onclick="return confirm('Remover {{ partner.name }}?')"
-                        style="color:var(--color-danger,#dc2626);">🗑️</button>
+                        style="color:var(--color-danger,#dc2626);">{{ icon("trash", size=15) }}</button>
               </form>
             </td>
           </tr>

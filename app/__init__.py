@@ -117,10 +117,14 @@ def create_app(config_name=None):
     app.register_blueprint(api_bp)
 
     # -----------------------------------------------
-    # Filtros Jinja2 customizados
+    # Filtros e globals Jinja2 customizados
     # -----------------------------------------------
     from app.utils.phone import to_whatsapp_url
+    from app.utils.icons import get_icon
+    from markupsafe import Markup
+
     app.jinja_env.filters['whatsapp_url'] = to_whatsapp_url
+    app.jinja_env.globals['icon'] = lambda name, **kw: Markup(get_icon(name, **kw))
 
     # -----------------------------------------------
     # Variáveis globais disponíveis em todos os templates

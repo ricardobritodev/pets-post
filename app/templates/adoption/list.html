@@ -24,22 +24,22 @@
     <a href="{{ url_for('adoption.list_posts', pet_type='dog') }}"
        class="filter-btn {{ 'active' if type_filter == 'dog' }}"
        aria-current="{{ 'true' if type_filter == 'dog' else 'false' }}">
-      🐶 Cachorros
+      {{ icon("paw", size=14) }} Cachorros
     </a>
     <a href="{{ url_for('adoption.list_posts', pet_type='cat') }}"
        class="filter-btn {{ 'active' if type_filter == 'cat' }}"
        aria-current="{{ 'true' if type_filter == 'cat' else 'false' }}">
-      🐱 Gatos
+      {{ icon("paw", size=14) }} Gatos
     </a>
     <a href="{{ url_for('adoption.list_posts', pet_type='bird') }}"
        class="filter-btn {{ 'active' if type_filter == 'bird' }}"
        aria-current="{{ 'true' if type_filter == 'bird' else 'false' }}">
-      🐦 Pássaros
+      {{ icon("paw", size=14) }} Pássaros
     </a>
     <a href="{{ url_for('adoption.list_posts', pet_type='other') }}"
        class="filter-btn {{ 'active' if type_filter == 'other' }}"
        aria-current="{{ 'true' if type_filter == 'other' else 'false' }}">
-      🐾 Outros
+      {{ icon("paw", size=14) }} Outros
     </a>
   </div>
 

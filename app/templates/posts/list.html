@@ -20,27 +20,27 @@
     </a>
     <a href="{{ url_for('posts.list_posts', status='lost') }}"
        class="filter-btn {{ 'active' if status_filter == 'lost' }}">
-      🔴 Perdidos
+      {{ icon("x-circle", size=14) }} Perdidos
     </a>
     <a href="{{ url_for('posts.list_posts', status='found') }}"
        class="filter-btn {{ 'active' if status_filter == 'found' }}">
-      🟢 Encontrados
+      {{ icon("check-circle", size=14) }} Encontrados
     </a>
     <a href="{{ url_for('posts.list_posts', pet_type='dog') }}"
        class="filter-btn {{ 'active' if type_filter == 'dog' }}">
-      🐶 Cachorros
+      {{ icon("paw", size=14) }} Cachorros
     </a>
     <a href="{{ url_for('posts.list_posts', pet_type='cat') }}"
        class="filter-btn {{ 'active' if type_filter == 'cat' }}">
-      🐱 Gatos
+      {{ icon("paw", size=14) }} Gatos
     </a>
     <a href="{{ url_for('posts.list_posts', pet_type='bird') }}"
        class="filter-btn {{ 'active' if type_filter == 'bird' }}">
-      🐦 Pássaros
+      {{ icon("paw", size=14) }} Pássaros
     </a>
     <a href="{{ url_for('posts.list_posts', pet_type='other') }}"
        class="filter-btn {{ 'active' if type_filter == 'other' }}">
-      🐾 Outros
+      {{ icon("paw", size=14) }} Outros
     </a>
   </div>
 
