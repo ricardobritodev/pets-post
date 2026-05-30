@@ -28,8 +28,8 @@ _PRODUCTION_CSP = {
     'script-src': ["'self'", 'unpkg.com'],
     'style-src': ["'self'", "'unsafe-inline'", 'fonts.googleapis.com', 'unpkg.com'],
     'font-src': ["'self'", 'fonts.gstatic.com'],
-    'img-src': ["'self'", 'data:', '*.tile.openstreetmap.org'],
-    'connect-src': ["'self'"],
+    'img-src': ["'self'", 'data:', '*.tile.openstreetmap.org', 'unpkg.com'],
+    'connect-src': ["'self'", 'fonts.googleapis.com', 'fonts.gstatic.com'],
     'frame-ancestors': "'none'",
 }
 

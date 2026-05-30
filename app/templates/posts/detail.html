@@ -80,7 +80,11 @@
 
       {# Mapa de localização #}
       {% if post.last_seen_lat and post.last_seen_lng %}
-      <div id="detail-map" class="detail-map" aria-label="Mapa da localização do pet"></div>
+      <div id="detail-map" class="detail-map" aria-label="Mapa da localização do pet"
+           data-lat="{{ post.last_seen_lat }}"
+           data-lng="{{ post.last_seen_lng }}"
+           data-label="{{ post.last_seen_location | e }}"
+           data-zoom="15"></div>
       {% endif %}
 
       {# Descrição #}
@@ -227,18 +231,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
-<script>
-(function () {
-  var lat   = {{ post.last_seen_lat | tojson }};
-  var lng   = {{ post.last_seen_lng | tojson }};
-  var label = {{ post.last_seen_location | tojson }};
-  var map = L.map('detail-map').setView([lat, lng], 15);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 19
-  }).addTo(map);
-  L.marker([lat, lng]).addTo(map).bindPopup(label).openPopup();
-}());
-</script>
+<script src="{{ url_for('static', filename='js/map-detail.js') }}"></script>
 {% endif %}
 {% endblock %}

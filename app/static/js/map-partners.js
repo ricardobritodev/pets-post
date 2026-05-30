@@ -1,0 +1,121 @@
+(function () {
+  var ICONS_SVG = {
+    foster_home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>',
+    petshop:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>',
+    vet_clinic:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>',
+  };
+
+  var TYPES = {
+    foster_home: { color: '#16a34a', icon: ICONS_SVG.foster_home },
+    petshop:     { color: '#2563eb', icon: ICONS_SVG.petshop },
+    vet_clinic:  { color: '#dc2626', icon: ICONS_SVG.vet_clinic },
+  };
+
+  var map = L.map('map').setView([-15.788, -47.879], 5);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(map);
+
+  var clusters = {};
+  Object.keys(TYPES).forEach(function (type) {
+    clusters[type] = L.markerClusterGroup({ showCoverageOnHover: false });
+    map.addLayer(clusters[type]);
+  });
+
+  function makeIcon(type) {
+    var cfg = TYPES[type] || { color: '#666', icon: ICONS_SVG.vet_clinic };
+    return L.divIcon({
+      className: '',
+      html: '<div class="marker-pin" style="background:' + cfg.color + ';display:flex;align-items:center;justify-content:center;color:white;">' + cfg.icon + '</div>',
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -30]
+    });
+  }
+
+  function makePopup(p) {
+    var cfg = TYPES[p.type] || { color: '#666' };
+    var pinSvg   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="display:inline;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>';
+    var phoneSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="display:inline;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.338c0-1.06.918-1.838 1.97-1.838h.008c.343 0 .675.11.948.314l3.86 2.847a.75.75 0 0 1 .148 1.06l-1.218 1.637a.75.75 0 0 0-.074.808l1.218 2.437a.75.75 0 0 0 .808.074l1.637-1.218a.75.75 0 0 1 1.06.148l2.847 3.86c.204.273.314.605.314.948v.008c0 1.052-.779 1.97-1.838 1.97h-.008a15.96 15.96 0 0 1-12.53-6.462A15.96 15.96 0 0 1 2.25 7.31v-.008Z"/></svg>';
+    var mailSvg  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="display:inline;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>';
+    var globeSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="display:inline;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"/></svg>';
+
+    var html = '<div style="min-width:200px;">';
+    html += '<strong style="font-size:1rem;">' + p.name + '</strong><br>';
+    html += '<span style="font-size:0.8rem;color:' + cfg.color + ';font-weight:600;">' + p.type_label + '</span>';
+    html += '<hr style="margin:6px 0;border:none;border-top:1px solid #eee;">';
+    html += '<div style="font-size:0.875rem;color:#555;">' + pinSvg + ' ' + p.address + '</div>';
+    if (p.phone) html += '<div style="font-size:0.875rem;margin-top:4px;">' + phoneSvg + ' <a href="tel:' + p.phone + '">' + p.phone + '</a></div>';
+    if (p.email) html += '<div style="font-size:0.875rem;margin-top:4px;">' + mailSvg + ' <a href="mailto:' + p.email + '">' + p.email + '</a></div>';
+    if (p.website && /^https?:\/\//i.test(p.website)) html += '<div style="font-size:0.875rem;margin-top:4px;">' + globeSvg + ' <a href="' + p.website + '" target="_blank" rel="noopener noreferrer">Visitar site</a></div>';
+    html += '<div style="margin-top:8px;"><a href="https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '" target="_blank" rel="noopener" style="font-size:0.8rem;color:#2563eb;">Como chegar →</a></div>';
+    html += '</div>';
+    return html;
+  }
+
+  var allPartners = [];
+
+  fetch('/api/parceiros', { credentials: 'same-origin' })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      allPartners = data;
+      data.forEach(function (p) {
+        if (!clusters[p.type]) return;
+        L.marker([p.lat, p.lng], { icon: makeIcon(p.type) })
+          .bindPopup(makePopup(p))
+          .addTo(clusters[p.type]);
+      });
+    })
+    .catch(function () {
+      console.warn('Não foi possível carregar os parceiros.');
+    });
+
+  var activeType = 'all';
+
+  document.querySelectorAll('.map-toolbar__filters .filter-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.map-toolbar__filters .filter-btn').forEach(function (b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      activeType = btn.dataset.type;
+
+      Object.keys(clusters).forEach(function (type) {
+        if (activeType === 'all' || activeType === type) {
+          if (!map.hasLayer(clusters[type])) map.addLayer(clusters[type]);
+        } else {
+          if (map.hasLayer(clusters[type])) map.removeLayer(clusters[type]);
+        }
+      });
+    });
+  });
+
+  function locateUser() {
+    if (!navigator.geolocation) {
+      alert('Seu browser não suporta geolocalização.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        var latlng = [pos.coords.latitude, pos.coords.longitude];
+        map.setView(latlng, 13);
+        L.circleMarker(latlng, {
+          radius: 10,
+          color: '#2563eb',
+          fillColor: '#2563eb',
+          fillOpacity: 0.3,
+          weight: 2,
+        }).addTo(map).bindPopup('Você está aqui').openPopup();
+      },
+      function () {
+        alert('Não foi possível obter sua localização. Verifique as permissões do browser.');
+      },
+      { timeout: 8000 }
+    );
+  }
+
+  document.getElementById('btn-locate').addEventListener('click', locateUser);
+  locateUser();
+}());

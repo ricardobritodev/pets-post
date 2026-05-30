@@ -90,4 +90,8 @@
 
   window.initCepLookup = initCepLookup;
 
+  document.addEventListener('DOMContentLoaded', function () {
+    initCepLookup('#cep-input', '#location-field');
+  });
+
 }());
