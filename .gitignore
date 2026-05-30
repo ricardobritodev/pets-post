@@ -1,36 +1,12 @@
-# ============================================================
-# .gitignore — Arquivos e pastas ignorados pelo Git
-# ============================================================
-#
-# Estes arquivos NÃO devem ir para o GitHub porque:
-#   - Contêm senhas e segredos (.env)
-#   - São gerados automaticamente e ocupam espaço (__pycache__)
-#   - São específicos de cada máquina (venv/)
-#   - Contêm fotos enviadas pelos usuários (uploads/)
-#
-# ============================================================
-
-# ----- DOCUMENTOS INTERNOS DO PROJETO -----
-# Arquivo de planejamento interno — não precisa ir para o repositório público
-PROMPT.md
-
-# ----- SEGREDOS E CONFIGURAÇÕES LOCAIS -----
-# O .env contém suas senhas de banco de dados e chaves secretas
-# NUNCA envie este arquivo para o GitHub!
 .env
 .env.local
 .env.*.local
 
-# ----- AMBIENTE VIRTUAL PYTHON -----
-# O ambiente virtual (venv) é gerado localmente por cada desenvolvedor
-# Cada um cria o seu com: python -m venv venv
 venv/
 env/
 ENV/
 .venv/
 
-# ----- CACHE DO PYTHON -----
-# Arquivos gerados automaticamente pelo Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -38,20 +14,17 @@ __pycache__/
 *.pyo
 *.pyd
 
-# ----- UPLOADS DE USUÁRIOS -----
-# Fotos enviadas pelos usuários ficam apenas no servidor
-# Não faz sentido versionar no git
+
 app/static/uploads/*
-# Mantém a pasta no git, mas ignora o conteúdo
+
 !app/static/uploads/.gitkeep
 
-# ----- BANCO DE DADOS LOCAL -----
-# Se usar SQLite durante desenvolvimento
+
 *.db
 *.sqlite
 *.sqlite3
 
-# ----- FLASK / PYTHON -----
+
 instance/
 .webassets-cache
 .pytest_cache/
@@ -63,28 +36,21 @@ build/
 *.egg
 MANIFEST
 
-# ----- IDEs e EDITORES -----
-# Visual Studio Code
+
 .vscode/
-# PyCharm / IntelliJ
 .idea/
 *.iml
-# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
-# Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-# Vim
 *.swp
 *.swo
 *~
 
-# ----- LOGS -----
 *.log
 logs/
 
-# ----- VARIÁVEIS DE AMBIENTE DO SISTEMA -----
 .python-version
