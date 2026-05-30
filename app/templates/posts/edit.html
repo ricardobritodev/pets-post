@@ -20,8 +20,9 @@
     <p class="text-muted">Atualize as informações do pet.</p>
   </div>
 
-  <form method="POST" enctype="multipart/form-data" novalidate>
+  <form method="POST" enctype="multipart/form-data" novalidate data-edit-mode="true">
     {{ form.hidden_tag() }}
+    <input type="hidden" id="photos-to-delete" name="photos_to_delete" value="">
 
     <div class="form-section">
       <h3 class="form-section__title">📋 Informações do anúncio</h3>
@@ -121,18 +122,15 @@
     {# Fotos existentes #}
     {% if post.photos %}
       <div class="form-section">
-        <h3 class="form-section__title">📷 Fotos atuais</h3>
-        <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+        <h3 class="form-section__title">📷 Fotos atuais <small style="font-weight:400;color:var(--color-text-muted);">{{ post.photos|length }} / 6 — clique no × para remover</small></h3>
+        <div class="photo-grid">
           {% for photo in post.photos %}
-            <div style="position: relative;">
-              <img
-                src="{{ photo.url }}"
-                alt="Foto {{ loop.index }}"
-                style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid {{ 'var(--color-primary)' if photo.is_primary else 'var(--color-border)' }};"
-              >
+            <div class="photo-grid-item existing-photo">
+              <img src="{{ photo.url }}" alt="Foto {{ loop.index }}">
               {% if photo.is_primary %}
-                <span style="position: absolute; bottom: 4px; left: 4px; background: var(--color-primary); color: white; font-size: 0.625rem; padding: 2px 5px; border-radius: 3px; font-weight: 700;">CAPA</span>
+                <span class="photo-grid-item__badge">Capa</span>
               {% endif %}
+              <button type="button" class="photo-grid-item__remove" data-photo-id="{{ photo.id }}" aria-label="Remover foto {{ loop.index }}">×</button>
             </div>
           {% endfor %}
         </div>
@@ -147,11 +145,11 @@
           <span style="font-size: 2rem; display: block; margin-bottom: var(--space-sm);">📸</span>
           {{ form.photos(id="photos", accept="image/*", multiple=True) }}
           <span class="form-hint" style="margin-top: var(--space-sm);">
-            Limite total: 5 fotos por anúncio · JPG, PNG, GIF, WEBP
+            Limite total: 6 fotos por anúncio · JPG, PNG, GIF, WEBP
           </span>
         </div>
         {% for error in form.photos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
-        <div id="photo-preview" style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: var(--space-sm);"></div>
+        <div class="photo-grid" id="photo-preview"></div>
       </div>
     </div>
 

@@ -27,7 +27,9 @@ flask create-db
 python seeds.py
 ```
 
-Environment requires a `.env` file (copy from `.env.example`) with `FLASK_APP=run.py`, `FLASK_ENV=development`, `SECRET_KEY`, and `DATABASE_URL` (MySQL in dev/prod).
+Environment requires a `.env` file (copy from `.env.example`) with `FLASK_APP=run.py`, `FLASK_CONFIG=development`, `SECRET_KEY`, and `DATABASE_URL` (MySQL in dev/prod). Use `FLASK_CONFIG` (not `FLASK_ENV`, removed in Flask 2.3).
+
+Production deployment uses `gunicorn` (in requirements.txt). Set `RATELIMIT_STORAGE_URI=redis://...` to enable Redis-backed rate limiting in production; omitting it uses in-memory storage (per-process, resets on restart).
 
 ## Architecture
 
@@ -49,7 +51,7 @@ Flask app using the **Application Factory** pattern. `create_app(config_name)` i
 
 Admin access is checked via `current_user.is_admin()` (`role == 'admin'`); admin routes use a `@admin_required` decorator defined in `app/routes/admin.py`.
 
-**Photo uploads:** Files are saved to `app/static/uploads/` with UUID-based filenames. `save_photo()` (duplicated in both `app/routes/posts.py` and `app/routes/adoption.py`) uses Pillow to resize images to max 800px width and convert RGBA/P mode images to RGB. Maximum 5 photos per post/listing; the first photo is marked `is_primary=True`.
+**Photo uploads:** Files are saved to `app/static/uploads/` with UUID-based filenames. `save_photo()` in `app/utils/upload.py` (imported by both `posts.py` and `adoption.py`) uses Pillow to resize images to max 800px width and convert RGBA/P mode images to RGB. Maximum 5 photos per post/listing; the first photo is marked `is_primary=True`. Upload limit: 8 MB (`MAX_CONTENT_LENGTH`); allowed extensions: `png`, `jpg`, `jpeg`, `gif`, `webp`.
 
 **Geocoding:** `app/services/geocoding.py` calls Nominatim (OpenStreetMap) server-side to convert a free-text address into `(lat, lng)`. Returns `(None, None)` on any failure — posts save normally without coordinates. Restricted to Brazil (`countrycodes=br`), 5 s timeout, 1 req/s limit per Nominatim ToS.
 
@@ -57,15 +59,17 @@ Admin access is checked via `current_user.is_admin()` (`role == 'admin'`); admin
 
 **Seeds default credentials** (after running `python seeds.py`): `admin@petpost.com` / `Admin@123`.
 
-**Photo upload utility:** `app/utils/upload.py` — single source of truth for `save_photo()` and `allowed_file()`. Both `posts.py` and `adoption.py` import from there. The function runs `Image.verify()` before processing (detects non-images), enforces a 20 MP pixel limit (decompression bomb guard), and always saves a Pillow-regenerated file — the original bytes never touch disk.
+**Photo upload utility:** `app/utils/upload.py` — `save_photo()` runs `Image.verify()` before processing (detects non-images), enforces a 20 MP pixel limit (decompression bomb guard), and always saves a Pillow-regenerated file — the original bytes never touch disk.
+
+**Jinja2 utilities registered in `create_app()`:**
+- `{{ icon('name') }}` — inline SVG from `app/utils/icons.py` (Heroicons 2.0 outline). Accepts `size=`, `cls=`, `aria_hidden=` kwargs. Falls back to `'info'` icon if name not found.
+- `{{ phone | whatsapp_url }}` — `app/utils/phone.py`; converts Brazilian phone number to `https://wa.me/...` URL. Returns `None` for 0800/invalid numbers.
 
 **Rate limiting:** Flask-Limiter is initialized in `app/extensions.py` (in-memory storage for dev; swap `storage_uri` to `'redis://...'` in production). Limits: login 10/min · 50/hr, register 5/min · 20/hr, `/api/cep` 30/min.
 
 **Security headers:** Flask-Talisman is activated only when `config_name == 'production'` inside `create_app()`. The CSP whitelist covers Leaflet (unpkg.com), Google Fonts, and OSM tiles. Do not enable Talisman in dev/testing — it interferes with test client redirects.
 
 **Production config (`FLASK_CONFIG=production`):** `ProductionConfig.init_app()` raises `RuntimeError` at startup if `SECRET_KEY` or `DATABASE_URL` are missing. Cookies gain `Secure=True`. Never run production without setting these env vars.
-
-**Environment variable:** Use `FLASK_CONFIG` (not `FLASK_ENV`, which was removed in Flask 2.3). Valid values: `development` (default), `testing`, `production`.
 
 **Security logging:** `logging.getLogger('petpost.security')` in `auth.py` records login success/failure, blocked accounts, registrations, and logouts with `user_id` + `ip`. Wire it to a file handler or syslog in production.
 

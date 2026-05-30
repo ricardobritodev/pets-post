@@ -8,7 +8,7 @@ Cada campo tem validadores que garantem os dados corretos.
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import (
-    DataRequired, Email, Length, EqualTo, Optional, ValidationError
+    DataRequired, Email, Length, EqualTo, Optional, Regexp, ValidationError
 )
 
 
@@ -19,9 +19,9 @@ class LoginForm(FlaskForm):
         'Email',
         validators=[
             DataRequired(message='O email é obrigatório.'),
-            Email(message='Informe um email válido.')
+            Email(check_deliverability=False, message='Informe um email válido.')
         ],
-        render_kw={'placeholder': 'seu@email.com', 'autocomplete': 'email'}
+        render_kw={'placeholder': 'seu@email.com', 'autocomplete': 'email', 'type': 'email'}
     )
 
     password = PasswordField(
@@ -54,15 +54,18 @@ class RegisterForm(FlaskForm):
         'Email',
         validators=[
             DataRequired(message='O email é obrigatório.'),
-            Email(message='Informe um email válido.')
+            Email(check_deliverability=False, message='Informe um email válido.')
         ],
-        render_kw={'placeholder': 'seu@email.com', 'autocomplete': 'email'}
+        render_kw={'placeholder': 'seu@email.com', 'autocomplete': 'email', 'type': 'email'}
     )
 
     phone = StringField(
         'Telefone (opcional)',
-        validators=[Optional()],
-        render_kw={'placeholder': '(11) 99999-9999'}
+        validators=[
+            Optional(),
+            Regexp(r'^\(\d{2}\) \d{4,5}-\d{4}$', message='Telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX.')
+        ],
+        render_kw={'placeholder': '(11) 99999-9999', 'type': 'tel', 'maxlength': '15'}
     )
 
     password = PasswordField(

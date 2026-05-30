@@ -40,47 +40,22 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // -----------------------------------------------
-  // 3. Preview de fotos antes do upload
+  // 3. Máscara de telefone
   // -----------------------------------------------
-  var photoInput = document.getElementById('photos');
-  var previewContainer = document.getElementById('photo-preview');
-
-  if (photoInput && previewContainer) {
-    photoInput.addEventListener('change', function () {
-      previewContainer.innerHTML = '';
-
-      var existingError = photoInput.parentNode.querySelector('.field-error--js');
-      if (existingError) existingError.remove();
-
-      var files = Array.from(this.files);
-
-      if (files.length > 5) {
-        var errorEl = document.createElement('span');
-        errorEl.className = 'field-error field-error--js';
-        errorEl.textContent = 'Selecione no máximo 5 fotos por post.';
-        photoInput.parentNode.insertBefore(errorEl, previewContainer);
-        this.value = '';
-        return;
-      }
-
-      files.forEach(function (file) {
-        if (!file.type.startsWith('image/')) return;
-
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var img = document.createElement('img');
-          img.src = e.target.result;
-          img.style.cssText = 'width:100px; height:100px; object-fit:cover; border-radius:var(--radius-md,8px); border:2px solid var(--color-border,#dee2e6);';
-          img.alt = file.name;
-          previewContainer.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-  }
+  initPhoneMask();
 
   // -----------------------------------------------
-  // 4. data-confirm — confirmação antes de ações destrutivas
+  // 4. Validação de email em tempo real
+  // -----------------------------------------------
+  initEmailValidation();
+
+  // -----------------------------------------------
+  // 5. Upload de fotos (drag-and-drop)
+  // -----------------------------------------------
+  initPhotoUpload();
+
+  // -----------------------------------------------
+  // 6. data-confirm — confirmação antes de ações destrutivas
   // -----------------------------------------------
   document.querySelectorAll('[data-confirm]').forEach(function (el) {
     el.addEventListener('click', function (e) {
@@ -93,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // -----------------------------------------------
-  // 5. data-form-submit — botões que disparam forms externos
+  // 7. data-form-submit — botões que disparam forms externos
   // -----------------------------------------------
   document.querySelectorAll('[data-form-submit]').forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -104,12 +79,12 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // -----------------------------------------------
-  // 6. Filtros dinâmicos sem reload (F-10)
+  // 8. Filtros dinâmicos sem reload (F-10)
   // -----------------------------------------------
   initDynamicFilters();
 
   // -----------------------------------------------
-  // 7. Menu hambúrguer para mobile (F-11)
+  // 9. Menu hambúrguer para mobile (F-11)
   // -----------------------------------------------
   initHamburgerMenu();
 
@@ -265,6 +240,206 @@ function initHamburgerMenu() {
       open ? 'Fechar menu de navegação' : 'Abrir menu de navegação'
     );
   }
+}
+
+// ================================================================
+// MÁSCARA DE TELEFONE BRASILEIRO
+// Aceita fixo (XX) XXXX-XXXX e celular (XX) XXXXX-XXXX.
+// Aplica-se a todos os input[type=tel].
+// ================================================================
+
+function initPhoneMask() {
+  document.querySelectorAll('input[type=tel]').forEach(function (input) {
+    input.setAttribute('maxlength', '15');
+    input.addEventListener('input', function () {
+      var digits = this.value.replace(/\D/g, '').slice(0, 11);
+      var masked = '';
+      if (digits.length === 0) {
+        masked = '';
+      } else if (digits.length <= 2) {
+        masked = '(' + digits;
+      } else if (digits.length <= 6) {
+        masked = '(' + digits.slice(0, 2) + ') ' + digits.slice(2);
+      } else if (digits.length <= 10) {
+        // Fixo: (XX) XXXX-XXXX
+        masked = '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 6) + '-' + digits.slice(6);
+      } else {
+        // Celular: (XX) XXXXX-XXXX
+        masked = '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 7) + '-' + digits.slice(7);
+      }
+      this.value = masked;
+    });
+  });
+}
+
+// ================================================================
+// VALIDAÇÃO DE EMAIL EM TEMPO REAL
+// Verifica formato mínimo (algo@algo.algo) no evento blur.
+// ================================================================
+
+function initEmailValidation() {
+  document.querySelectorAll('input[type=email]').forEach(function (input) {
+    input.addEventListener('blur', function () {
+      var val = this.value.trim();
+
+      // Remove erro anterior gerado por este script
+      var prev = this.parentNode.querySelector('.field-error--email-js');
+      if (prev) prev.remove();
+
+      // Campo vazio e não obrigatório: sem mensagem
+      if (!val && !this.required) return;
+
+      // Validação: precisa de @, algo antes e algo.algo depois
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      if (!valid) {
+        var err = document.createElement('span');
+        err.className = 'field-error field-error--email-js';
+        err.textContent = 'Informe um email válido (ex: nome@dominio.com).';
+        this.parentNode.appendChild(err);
+      }
+    });
+
+    // Remove o erro ao começar a digitar novamente
+    input.addEventListener('input', function () {
+      var prev = this.parentNode.querySelector('.field-error--email-js');
+      if (prev) prev.remove();
+    });
+  });
+}
+
+// ================================================================
+// UPLOAD DE FOTOS COM DRAG-AND-DROP
+// Create pages: drop zone + preview em grid + contador.
+// Edit pages (form[data-edit-mode]): botão × nas fotos existentes.
+// ================================================================
+
+var MAX_PHOTOS = 6;
+
+function initPhotoUpload() {
+  var zone      = document.getElementById('upload-zone');
+  var input     = document.getElementById('photos');
+  var preview   = document.getElementById('photo-preview');
+  var counter   = document.getElementById('upload-counter');
+  var form      = document.querySelector('form[data-edit-mode]');
+  var deleteFld = document.getElementById('photos-to-delete');
+
+  // ── Drag-and-drop / click para criar post ───────────────────────
+  if (zone && input && preview) {
+    // Abre o file picker ao clicar na zona
+    zone.addEventListener('click', function () { input.click(); });
+
+    zone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      zone.classList.add('is-dragging');
+    });
+    zone.addEventListener('dragleave', function () {
+      zone.classList.remove('is-dragging');
+    });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zone.classList.remove('is-dragging');
+      applyFiles(e.dataTransfer.files);
+    });
+
+    input.addEventListener('change', function () {
+      applyFiles(this.files);
+    });
+
+    function applyFiles(fileList) {
+      var files = Array.from(fileList).filter(function (f) { return f.type.startsWith('image/'); });
+
+      // Remove erro anterior
+      var prev = zone.parentNode.querySelector('.field-error--js');
+      if (prev) prev.remove();
+
+      if (files.length > MAX_PHOTOS) {
+        showZoneError(zone, 'Selecione no máximo ' + MAX_PHOTOS + ' fotos.');
+        input.value = '';
+        return;
+      }
+
+      // Recria a lista de arquivos no input via DataTransfer
+      var dt = new DataTransfer();
+      files.forEach(function (f) { dt.items.add(f); });
+      input.files = dt.files;
+
+      renderPreviews(files, preview, counter, input);
+    }
+  }
+
+  // ── Deleção de fotos no edit ────────────────────────────────────
+  if (form && deleteFld) {
+    var toDelete = [];
+
+    document.querySelectorAll('.photo-grid-item__remove').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.dataset.photoId;
+        var card = this.closest('.photo-grid-item');
+        if (!id || !card) return;
+
+        toDelete.push(id);
+        deleteFld.value = toDelete.join(',');
+        card.classList.add('marked-for-delete');
+        btn.disabled = true;
+      });
+    });
+  }
+
+  // ── Preview drag-and-drop do edit (adicionar novas fotos) ───────
+  if (!zone && input && preview) {
+    input.addEventListener('change', function () {
+      var files = Array.from(this.files).filter(function (f) { return f.type.startsWith('image/'); });
+      renderPreviews(files, preview, null, null);
+    });
+  }
+}
+
+function renderPreviews(files, container, counter, input) {
+  container.innerHTML = '';
+  if (counter) counter.textContent = files.length + ' / ' + MAX_PHOTOS;
+
+  files.forEach(function (file, idx) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var item = document.createElement('div');
+      item.className = 'photo-grid-item';
+
+      var img = document.createElement('img');
+      img.src = e.target.result;
+      img.alt = file.name;
+
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'photo-grid-item__remove';
+      removeBtn.setAttribute('aria-label', 'Remover foto');
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', function () {
+        item.remove();
+        // Recria o input sem esse arquivo
+        if (input) {
+          var dt = new DataTransfer();
+          Array.from(input.files).forEach(function (f, i) {
+            if (i !== idx) dt.items.add(f);
+          });
+          input.files = dt.files;
+        }
+        var counter2 = document.getElementById('upload-counter');
+        if (counter2) counter2.textContent = container.querySelectorAll('.photo-grid-item').length + ' / ' + MAX_PHOTOS;
+      });
+
+      item.appendChild(img);
+      item.appendChild(removeBtn);
+      container.appendChild(item);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function showZoneError(zone, msg) {
+  var err = document.createElement('span');
+  err.className = 'field-error field-error--js';
+  err.textContent = msg;
+  zone.parentNode.insertBefore(err, zone.nextSibling);
 }
 
 // Marca como ativo o botão cujos query params coincidem com a URL atual

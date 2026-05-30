@@ -727,6 +727,119 @@ textarea { resize: vertical; }
   box-shadow: none;
 }
 
+/* ── Drop zone moderna ────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--color-bg);
+  user-select: none;
+}
+.upload-zone:hover,
+.upload-zone.is-dragging {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg, #eff6ff);
+}
+.upload-zone.is-dragging {
+  border-style: solid;
+}
+.upload-zone input[type="file"] {
+  display: none;
+}
+.upload-zone__icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: var(--space-sm);
+  pointer-events: none;
+}
+.upload-zone__text {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  pointer-events: none;
+}
+.upload-zone__browse {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.upload-zone__hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+  pointer-events: none;
+}
+.upload-counter {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+  font-weight: 500;
+}
+
+/* ── Grid de preview de fotos ────────────────────────────── */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+.photo-grid-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-alt, #f8f9fa);
+}
+.photo-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-grid-item__badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 0.6rem;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.photo-grid-item__remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s;
+}
+.photo-grid-item__remove:hover {
+  background: var(--color-danger, #dc2626);
+}
+.photo-grid-item.marked-for-delete {
+  opacity: 0.35;
+  filter: grayscale(1);
+  outline: 2px solid var(--color-danger, #dc2626);
+}
+
 .form-check {
   display: flex;
   align-items: center;

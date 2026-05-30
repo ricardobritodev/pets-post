@@ -139,12 +139,32 @@ def edit(post_id):
         post.contact_phone = form.contact_phone.data.strip()
         post.contact_email = form.contact_email.data.strip() if form.contact_email.data else None
 
+        # Deleta fotos marcadas pelo usuário
+        photos_to_delete = request.form.get('photos_to_delete', '')
+        if photos_to_delete:
+            upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+            for raw_id in photos_to_delete.split(','):
+                try:
+                    photo_id = int(raw_id.strip())
+                except ValueError:
+                    continue
+                photo = AdoptionPhoto.query.filter_by(id=photo_id, adoption_post_id=post.id).first()
+                if photo:
+                    filepath = os.path.join(upload_folder, photo.filename)
+                    if os.path.exists(filepath):
+                        os.remove(filepath)
+                    db.session.delete(photo)
+            db.session.flush()
+            remaining = AdoptionPhoto.query.filter_by(adoption_post_id=post.id).all()
+            if remaining and not any(p.is_primary for p in remaining):
+                remaining[0].is_primary = True
+
         if form.photos.data:
             current_count = len(post.photos)
             for file in form.photos.data:
                 if file and file.filename and allowed_file(file.filename):
-                    if current_count >= 5:
-                        flash('Limite de 5 fotos atingido. Novas fotos não foram adicionadas.', 'warning')
+                    if current_count >= 6:
+                        flash('Limite de 6 fotos atingido. Novas fotos não foram adicionadas.', 'warning')
                         break
                     try:
                         filename = save_photo(file)

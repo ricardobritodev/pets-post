@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Optional, Length, Email, URL
+from wtforms.validators import DataRequired, Optional, Length, Email, Regexp, URL
 
 
 class PartnerForm(FlaskForm):
@@ -44,14 +44,17 @@ class PartnerForm(FlaskForm):
 
     phone = StringField(
         'Telefone (opcional)',
-        validators=[Optional(), Length(max=20)],
-        render_kw={'placeholder': '(11) 99999-9999'}
+        validators=[
+            Optional(),
+            Regexp(r'^\(\d{2}\) \d{4,5}-\d{4}$', message='Telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX.')
+        ],
+        render_kw={'placeholder': '(11) 99999-9999', 'type': 'tel', 'maxlength': '15'}
     )
 
     email = StringField(
         'Email (opcional)',
-        validators=[Optional(), Email(message='Informe um email válido.')],
-        render_kw={'placeholder': 'contato@local.com'}
+        validators=[Optional(), Email(check_deliverability=False, message='Informe um email válido.')],
+        render_kw={'placeholder': 'contato@local.com', 'type': 'email'}
     )
 
     website = StringField(

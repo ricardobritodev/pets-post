@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import MultipleFileField, FileAllowed
 from wtforms import StringField, TextAreaField, SelectField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Optional, Length, Email, ValidationError
+from wtforms.validators import DataRequired, Optional, Length, Email, Regexp, ValidationError
 
 
 class AdoptionForm(FlaskForm):
@@ -98,19 +98,19 @@ class AdoptionForm(FlaskForm):
         'Telefone para contato',
         validators=[
             DataRequired(message='O telefone de contato é obrigatório.'),
-            Length(max=20)
+            Regexp(r'^\(\d{2}\) \d{4,5}-\d{4}$', message='Telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX.')
         ],
-        render_kw={'placeholder': '(11) 99999-9999'}
+        render_kw={'placeholder': '(11) 99999-9999', 'type': 'tel', 'maxlength': '15'}
     )
 
     contact_email = StringField(
         'Email para contato (opcional)',
-        validators=[Optional(), Email(message='Informe um email válido.')],
-        render_kw={'placeholder': 'contato@email.com'}
+        validators=[Optional(), Email(check_deliverability=False, message='Informe um email válido.')],
+        render_kw={'placeholder': 'contato@email.com', 'type': 'email'}
     )
 
     photos = MultipleFileField(
-        'Fotos do pet (máximo 5)',
+        'Fotos do pet (máximo 6)',
         validators=[
             FileAllowed(
                 ['png', 'jpg', 'jpeg', 'gif', 'webp'],
@@ -124,5 +124,5 @@ class AdoptionForm(FlaskForm):
     def validate_photos(self, field):
         if field.data:
             valid_files = [f for f in field.data if f and f.filename]
-            if len(valid_files) > 5:
-                raise ValidationError('Você pode enviar no máximo 5 fotos por anúncio.')
+            if len(valid_files) > 6:
+                raise ValidationError('Você pode enviar no máximo 6 fotos por anúncio.')

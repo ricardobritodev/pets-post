@@ -140,15 +140,15 @@
       <h3 class="form-section__title">📷 Fotos do pet</h3>
 
       <div class="form-group">
-        <div class="file-upload">
-          <span style="font-size: 2rem; display: block; margin-bottom: var(--space-sm);">📸</span>
+        <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="Área de upload de fotos">
+          <span class="upload-zone__icon">📸</span>
+          <p class="upload-zone__text">Arraste as fotos aqui ou <span class="upload-zone__browse">clique para selecionar</span></p>
+          <span class="upload-zone__hint">Até 6 fotos · JPG, PNG, GIF, WEBP · 8 MB máx.</span>
           {{ form.photos(id="photos", accept="image/*", multiple=True) }}
-          <span class="form-hint" style="margin-top: var(--space-sm);">
-            Até 5 fotos · JPG, PNG, GIF, WEBP · Máximo 16 MB por arquivo
-          </span>
         </div>
+        <div class="upload-counter" id="upload-counter">0 / 6</div>
         {% for error in form.photos.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
-        <div id="photo-preview" style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: var(--space-sm);"></div>
+        <div class="photo-grid" id="photo-preview"></div>
       </div>
     </div>
 
