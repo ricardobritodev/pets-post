@@ -90,8 +90,7 @@
 
   window.initCepLookup = initCepLookup;
 
-  document.addEventListener('DOMContentLoaded', function () {
-    initCepLookup('#cep-input', '#location-field');
-  });
+  // Chamada direta — cep.js é carregado no final do <body>, DOM já disponível.
+  initCepLookup('#cep-input', '#location-field');
 
 }());

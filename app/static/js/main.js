@@ -249,7 +249,7 @@ function initHamburgerMenu() {
 // ================================================================
 
 function initPhoneMask() {
-  document.querySelectorAll('input[type=tel]').forEach(function (input) {
+  document.querySelectorAll('input[name="phone"], input[name="contact_phone"]').forEach(function (input) {
     input.setAttribute('maxlength', '15');
     input.addEventListener('input', function () {
       var digits = this.value.replace(/\D/g, '').slice(0, 11);
@@ -278,7 +278,7 @@ function initPhoneMask() {
 // ================================================================
 
 function initEmailValidation() {
-  document.querySelectorAll('input[type=email]').forEach(function (input) {
+  document.querySelectorAll('input[name="email"], input[name="contact_email"]').forEach(function (input) {
     input.addEventListener('blur', function () {
       var val = this.value.trim();
 
