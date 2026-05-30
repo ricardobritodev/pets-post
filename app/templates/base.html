@@ -7,6 +7,9 @@
 
   <title>{% block title %}{% if title %}{{ title }} | Pets Post{% else %}Pets Post{% endif %}{% endblock %}</title>
 
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,11 +29,7 @@
 
         {# ── Coluna 1: Logo ── #}
         <a href="{{ url_for('main.index') }}" class="navbar__brand">
-          <span class="navbar__logo-icon">{{ icon('paw', size=22) }}</span>
-          <span class="navbar__brand-name">
-            <span>Pets Post</span>
-            <span>Encontre pets perdidos</span>
-          </span>
+          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pets Post" height="36">
         </a>
 
         {# ── Coluna 2: Navegação central (desktop) ── #}
@@ -170,7 +169,9 @@
       <div class="footer__grid">
 
         <div>
-          <span class="footer__brand">{{ icon('paw', size=18) }} Pets Post</span>
+          <span class="footer__brand">
+            <img src="{{ url_for('static', filename='images/logo-white.png') }}" alt="Pets Post" height="32">
+          </span>
           <p class="footer__tagline">
             Conectando pessoas que encontraram pets perdidos com seus donos.
             Juntos ajudamos famílias a reencontrar seus companheiros.
