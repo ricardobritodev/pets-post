@@ -248,9 +248,19 @@ function initHamburgerMenu() {
 // Aplica-se a todos os input[type=tel].
 // ================================================================
 
+function blockNonDigits(e) {
+  if (e.ctrlKey || e.metaKey) return;
+  if (['Backspace','Delete','Tab','Escape','Enter',
+       'ArrowLeft','ArrowRight','ArrowUp','ArrowDown',
+       'Home','End'].indexOf(e.key) !== -1) return;
+  if (!/^\d$/.test(e.key)) e.preventDefault();
+}
+
 function initPhoneMask() {
   document.querySelectorAll('input[name="phone"], input[name="contact_phone"]').forEach(function (input) {
     input.setAttribute('maxlength', '15');
+    input.setAttribute('inputmode', 'numeric');
+    input.addEventListener('keydown', blockNonDigits);
     input.addEventListener('input', function () {
       var digits = this.value.replace(/\D/g, '').slice(0, 11);
       var masked = '';

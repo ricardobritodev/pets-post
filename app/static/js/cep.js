@@ -28,6 +28,14 @@
     let controller   = null;
     let debounceTimer = null;
 
+    cepInput.addEventListener('keydown', function (e) {
+      if (e.ctrlKey || e.metaKey) return;
+      if (['Backspace','Delete','Tab','Escape','Enter',
+           'ArrowLeft','ArrowRight','ArrowUp','ArrowDown',
+           'Home','End'].indexOf(e.key) !== -1) return;
+      if (!/^\d$/.test(e.key)) e.preventDefault();
+    });
+
     cepInput.addEventListener('input', function () {
       applyMask(this);
       const digits = this.value.replace(/\D/g, '');
